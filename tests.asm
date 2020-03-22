@@ -18,7 +18,7 @@ ASSUME   CS:CSEG, DS:DSEG, SS:SSEG
 
 ;%include oxylib/oxygraph.asm
 ;%include oxylib/oxylib.asm
-;%include oxylib/oxygame.asm
+;include oxylib/oxygame.asm
 %include game.asm
 ;%include oxylib/oxyrand.asm
 
