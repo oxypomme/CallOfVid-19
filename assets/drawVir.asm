@@ -1,4 +1,4 @@
-virASSET MACRO xA, yA
+g_DRAWVIRUS MACRO xA, yA
     push AX
     push BX
 

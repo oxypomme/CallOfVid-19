@@ -118,6 +118,9 @@ MAIN     PROC FAR
          je   Dpressed
          cmp  AH, _Rightkey_
          je   Dpressed
+         ; Si c'est espace
+         cmp  AH, _SPACEkey_
+         je   SPACEpressed
          ; Si c'est ECHAP
          cmp  AH, _ESCkey_
          je   menu
@@ -135,6 +138,9 @@ MAIN     PROC FAR
               jmp  draw
          Dpressed:  
               call g_PRIGHTWARD  
+              jmp  draw
+         SPACEpressed:
+              call g_SHOOT
               jmp  draw
 
     endprog:

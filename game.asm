@@ -3,9 +3,11 @@
 DSEG        SEGMENT
     playerX         DW 32
     playerY         DW 32
+    playerRight     DB 1
 
     projX           DW 0
     projY           DW 0
+    projRight       DB 1
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -18,22 +20,37 @@ DSEG        SEGMENT
     g_playerSpeed   DW 8
     g_projSize      DW 16
     g_projSpeed     DW 5
-    g_playerRight   DB 1
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
-    cmp  g_playerRight, 0
-    jnz  oxjDrawR
+    cmp  playerRight, 0
+    jnz  gPdrawR
 
     %include assets/drawPl.asm
-    jmp  oxjDrawEnd
+    jmp  gPdrawEnd
 
-    oxjDrawR:
+    gPdrawR:
          %include assets/drawPr.asm
 
-    oxjDrawEnd:
+    gPdrawEnd:
          ret
 g_DRAWPLAYER ENDP
+
+g_DRAWBULLET PROC NEAR
+    cmp  projRight, 0
+    jnz  gBdrawR
+
+    %include assets/drawBl.asm
+    jmp  gBdrawEnd
+
+    gBdrawR:
+         %include assets/drawBr.asm
+    
+    gPdrawEnd:
+         ret
+g_DRAWPROJ ENDP
+
+%include assets/drawVir.asm
 
 g_PFORWARD PROC NEAR
     push AX
@@ -60,7 +77,7 @@ g_PFORWARD ENDP
 g_PLEFTWARD PROC NEAR
     push AX
     push BX
-    mov g_playerRight, 0
+    mov playerRight, 0
 
     mov  AX, playerX
     mov  BX, 0h
@@ -105,7 +122,7 @@ g_PBACKWARD ENDP
 g_PRIGHTWARD PROC NEAR
     push AX
     push BX
-    mov g_playerRight, 1
+    mov playerRight, 1
 
     mov  AX, playerX
     mov  BX, 140h
@@ -144,12 +161,6 @@ g_SHOOT PROC NEAR
 
     ret
 g_SHOOT ENDP
-
-g_DRAWVIRUS MACRO xA, yA
-    %include assets/drawVir.asm
-    virASSET xA, yA
-ENDM
-
 
 g_MENU PROC NEAR
     push AX
