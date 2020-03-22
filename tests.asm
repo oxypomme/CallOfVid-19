@@ -17,7 +17,8 @@ CSEG     SEGMENT 'CODE'
 ASSUME   CS:CSEG, DS:DSEG, SS:SSEG
 
 ;%include oxylib/oxygraph.asm
-%include oxylib/oxylib.asm
+;%include oxylib/oxylib.asm
+;%include oxylib/oxygame.asm
 %include game.asm
 ;%include oxylib/oxyrand.asm
 
@@ -41,7 +42,7 @@ MAIN     PROC FAR
 
          oxgFILLS 0, 0, 39, 24, _WHITE_
 
-         call oxj_MENU
+         call g_MENU
 
          push AX
          ; on récupère la touche appuyée dans AH
@@ -87,7 +88,7 @@ MAIN     PROC FAR
 
          oxgCLEAR
 
-         call oxj_DRAWPLAYER
+         call g_DRAWPLAYER
 
          push AX
          mov  AH, 01h ; on veut vérifier si une touche est appuyée
@@ -124,16 +125,16 @@ MAIN     PROC FAR
          jmp  draw
 
          Zpressed:  
-              call oxj_PFORWARD
+              call g_PFORWARD
               jmp  draw
          Qpressed:  
-              call oxj_PLEFTWARD
+              call g_PLEFTWARD
               jmp  draw
          Spressed: 
-              call oxj_PBACKWARD
+              call g_PBACKWARD
               jmp  draw
          Dpressed:  
-              call oxj_PRIGHTWARD  
+              call g_PRIGHTWARD  
               jmp  draw
 
     endprog:

@@ -1,18 +1,6 @@
-%include oxylib/oxygraph.asm
+%include oxylib/oxygame.asm
 
 DSEG        SEGMENT
-    ; Define few keys
-    _Zkey_          EQU 2Ch
-    _Qkey_          EQU 10h
-    _Skey_          EQU 1Fh
-    _Dkey_          EQU 20h
-    _Upkey_         EQU 48h
-    _Leftkey_       EQU 4Bh
-    _Downkey_       EQU 50h
-    _Rightkey_      EQU 4Dh
-    _ESCkey_        EQU 01h
-    _ENTERkey_      EQU 1Ch
-
     playerX         DW 32
     playerY         DW 32
 
@@ -26,8 +14,6 @@ DSEG        SEGMENT
     quitBtn         DB "Quit"
     l_quitBtn       EQU $-quitBtn
 
-    oxj_framerate   DW 0
-
     g_playerSize    DW 16
     g_playerSpeed   DW 8
     g_projSize      DW 16
@@ -35,29 +21,7 @@ DSEG        SEGMENT
     g_playerRight   DB 1
 DSEG        ENDS
 
-oxj_FRM PROC NEAR
-    cmp  oxj_framerate, 25
-    jg   midfrm
-    jmp  lowfrm
-    lowfrm:
-         oxDELAY 0FA0h
-         jmp finnalyFrm
-    midfrm:
-         oxDELAY 0BB8h
-         jmp finnalyFrm
-    highfrm:
-         oxDELAY 0FA0h
-         jmp finnalyFrm
-    finnalyFrm:
-         ret
-oxj_FRM ENDP
-
-oxj_GETKEY PROC NEAR
-    mov  AH, 10h
-    int  16h
-oxj_GETKEY ENDP
-
-oxj_DRAWPLAYER PROC NEAR
+g_DRAWPLAYER PROC NEAR
     cmp  g_playerRight, 0
     jnz  oxjDrawR
 
@@ -69,9 +33,9 @@ oxj_DRAWPLAYER PROC NEAR
 
     oxjDrawEnd:
          ret
-oxj_DRAWPLAYER ENDP
+g_DRAWPLAYER ENDP
 
-oxj_PFORWARD PROC NEAR
+g_PFORWARD PROC NEAR
     push AX
     push BX
 
@@ -91,9 +55,9 @@ oxj_PFORWARD PROC NEAR
         pop  AX
 
         ret
-oxj_PFORWARD ENDP
+g_PFORWARD ENDP
 
-oxj_PLEFTWARD PROC NEAR
+g_PLEFTWARD PROC NEAR
     push AX
     push BX
     mov g_playerRight, 0
@@ -114,9 +78,9 @@ oxj_PLEFTWARD PROC NEAR
         pop  AX
 
         ret
-oxj_PLEFTWARD ENDP
+g_PLEFTWARD ENDP
 
-oxj_PBACKWARD PROC NEAR
+g_PBACKWARD PROC NEAR
     push AX
     push BX
 
@@ -136,9 +100,9 @@ oxj_PBACKWARD PROC NEAR
         pop  AX
 
         ret
-oxj_PBACKWARD ENDP
+g_PBACKWARD ENDP
 
-oxj_PRIGHTWARD PROC NEAR
+g_PRIGHTWARD PROC NEAR
     push AX
     push BX
     mov g_playerRight, 1
@@ -160,9 +124,9 @@ oxj_PRIGHTWARD PROC NEAR
         pop  AX
 
         ret
-oxj_PRIGHTWARD ENDP
+g_PRIGHTWARD ENDP
 
-oxj_SHOOT PROC NEAR
+g_SHOOT PROC NEAR
     push AX
     
     mov  AX, projX
@@ -179,15 +143,15 @@ oxj_SHOOT PROC NEAR
     oxgSHOWHORLINE projX, projY, g_projSize, _WHITE_
 
     ret
-oxj_SHOOT ENDP
+g_SHOOT ENDP
 
-oxjDRAWVIRUS MACRO xA, yA
+g_DRAWVIRUS MACRO xA, yA
     %include assets/drawVir.asm
     virASSET xA, yA
 ENDM
 
 
-oxj_MENU PROC NEAR
+g_MENU PROC NEAR
     push AX
     push BX
     push CX
@@ -223,11 +187,11 @@ oxj_MENU PROC NEAR
     ; on affiche le selecteur
     mov  DX, cursY
     sub  DX, 16
-    oxjDRAWVIRUS 122, DX
+    g_DRAWVIRUS 122, DX
 
     pop  DX
     pop  CX
     pop  BX
     pop  AX
     ret
-oxj_MENU ENDP
+g_MENU ENDP
