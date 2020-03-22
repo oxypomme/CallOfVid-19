@@ -1,0 +1,4 @@
+oxylib/
+.vscode/
+*.exe
+*.obj
