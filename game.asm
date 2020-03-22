@@ -20,6 +20,7 @@ DSEG        SEGMENT
     g_playerSpeed   DW 8
     g_projSize      DW 16
     g_projSpeed     DW 5
+    g_projShow      DB 0
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
@@ -41,14 +42,38 @@ g_DRAWBULLET PROC NEAR
     jnz  gBdrawR
 
     %include assets/drawBl.asm
+    call ANIMATEBULLETL
     jmp  gBdrawEnd
 
     gBdrawR:
          %include assets/drawBr.asm
+         call ANIMATEBULLETR
     
-    gPdrawEnd:
+    gBdrawEnd:
          ret
-g_DRAWPROJ ENDP
+g_DRAWBULLET ENDP
+
+ANIMATEBULLETR PROC NEAR
+    push AX
+
+    mov  AX, projX
+    add  AX, g_projSpeed
+    mov  projX, AX
+
+    pop  AX
+    ret
+ANIMATEBULLETR ENDP
+
+ANIMATEBULLETL PROC NEAR
+    push AX
+
+    mov  AX, projX
+    sub  AX, g_projSpeed
+    mov  projX, AX
+
+    pop  AX
+    ret
+ANIMATEBULLETL ENDP
 
 %include assets/drawVir.asm
 
@@ -157,7 +182,7 @@ g_SHOOT PROC NEAR
 
     pop  AX
 
-    oxgSHOWHORLINE projX, projY, g_projSize, _WHITE_
+    mov g_projShow, 1
 
     ret
 g_SHOOT ENDP

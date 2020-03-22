@@ -90,6 +90,12 @@ MAIN     PROC FAR
 
          call g_DRAWPLAYER
 
+         cmp  g_projShow, 0
+         jnz  drawProj
+         jmp  ndrawProj
+
+         drawProj: call g_DRAWBULLET
+         ndrawProj:
          push AX
          mov  AH, 01h ; on veut vérifier si une touche est appuyée
          int  16h     ; on vérifie si une touche est appuyée
