@@ -7,7 +7,6 @@ DSEG        SEGMENT
 
     projX           DW 0
     projY           DW 0
-    projRight       DB 1
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -38,7 +37,7 @@ g_DRAWPLAYER PROC NEAR
 g_DRAWPLAYER ENDP
 
 g_DRAWBULLET PROC NEAR
-    cmp  projRight, 0
+    cmp  playerRight, 0
     jnz  gBdrawR
 
     %include assets/drawBl.asm
@@ -59,9 +58,16 @@ ANIMATEBULLETR PROC NEAR
     mov  AX, projX
     add  AX, g_projSpeed
     mov  projX, AX
+    mov  AX, 140h
+    sub  AX, g_projSize
+    cmp  projX, AX
+    jl   endBAnimR
 
-    pop  AX
-    ret
+    mov  g_projShow, 0
+
+    endBAnimR:
+         pop  AX
+         ret
 ANIMATEBULLETR ENDP
 
 ANIMATEBULLETL PROC NEAR
@@ -70,9 +76,16 @@ ANIMATEBULLETL PROC NEAR
     mov  AX, projX
     sub  AX, g_projSpeed
     mov  projX, AX
+    mov  AX, 0h
+    add  AX, g_projSize
+    cmp  projX, AX
+    jg   endBAnimL
 
-    pop  AX
-    ret
+    mov  g_projShow, 0
+
+    endBAnimL:
+        pop  AX
+        ret
 ANIMATEBULLETL ENDP
 
 %include assets/drawVir.asm
@@ -171,7 +184,8 @@ g_PRIGHTWARD ENDP
 g_SHOOT PROC NEAR
     push AX
     
-    mov  AX, projX
+    mov  AX, playerX
+    add  AX, g_playerSize
     add  AX, g_projSpeed
     mov  projX, AX
 
