@@ -34,16 +34,16 @@ g_DRAWPLAYER PROC NEAR
     %include assets/drawPl.asm
     jmp gPdrawEnd
     gPdrawAltL:
-        %include assets/drawPr.asm
+        %include assets/drawPlA.asm
         jmp  gPdrawEnd
 
     gPdrawR:
         cmp g_altSprite, 0
         jnz gPdrawAltR
-        %include assets/drawPl.asm
+        %include assets/drawPr.asm
         jmp  gPdrawEnd
     gPdrawAltR:
-        %include assets/drawPr.asm
+        %include assets/drawPrA.asm
 
     gPdrawEnd:
          ret
@@ -127,7 +127,7 @@ g_PFORWARD ENDP
 
 g_ANIMATEPLAYER PROC NEAR
     inc g_spriteCounter
-    cmp g_spriteCounter, 20
+    cmp g_spriteCounter, 40
     jne gAnimRet
     xor g_altSprite, 1
     mov g_spriteCounter, 0
@@ -267,9 +267,6 @@ g_MENU PROC NEAR
     int  21h
     oxgSETCURSOR 0, 0
 
-    ; on affiche le selecteur
-    mov  DX, cursY
-    sub  DX, 16
     g_DRAWVIRUS 122, DX
 
     pop  DX
