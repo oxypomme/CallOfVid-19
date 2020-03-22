@@ -7,6 +7,7 @@ DSEG        SEGMENT
 
     projX           DW 0
     projY           DW 0
+    projRight       DB 1
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -18,34 +19,46 @@ DSEG        SEGMENT
     g_playerSize    DW 16
     g_playerSpeed   DW 8
     g_projSize      DW 16
-    g_projSpeed     DW 5
+    g_projSpeed     DW 1
     g_projShow      DB 0
+    g_altSprite     DB 0
+    g_spriteCounter DW 0
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
     cmp  playerRight, 0
     jnz  gPdrawR
 
+    cmp g_altSprite, 0
+    jnz gPdrawAltL
     %include assets/drawPl.asm
-    jmp  gPdrawEnd
+    jmp gPdrawEnd
+    gPdrawAltL:
+        %include assets/drawPr.asm
+        jmp  gPdrawEnd
 
     gPdrawR:
-         %include assets/drawPr.asm
+        cmp g_altSprite, 0
+        jnz gPdrawAltR
+        %include assets/drawPl.asm
+        jmp  gPdrawEnd
+    gPdrawAltR:
+        %include assets/drawPr.asm
 
     gPdrawEnd:
          ret
 g_DRAWPLAYER ENDP
 
 g_DRAWBULLET PROC NEAR
-    cmp  playerRight, 0
+    cmp  projRight, 0
     jnz  gBdrawR
 
-    %include assets/drawBl.asm
+    %include assets/drawSerL.asm
     call ANIMATEBULLETL
     jmp  gBdrawEnd
 
     gBdrawR:
-         %include assets/drawBr.asm
+         %include assets/drawSerR.asm
          call ANIMATEBULLETR
     
     gBdrawEnd:
@@ -77,7 +90,7 @@ ANIMATEBULLETL PROC NEAR
     sub  AX, g_projSpeed
     mov  projX, AX
     mov  AX, 0h
-    add  AX, g_projSize
+    ;add  AX, g_projSize
     cmp  projX, AX
     jg   endBAnimL
 
@@ -111,6 +124,16 @@ g_PFORWARD PROC NEAR
 
         ret
 g_PFORWARD ENDP
+
+g_ANIMATEPLAYER PROC NEAR
+    inc g_spriteCounter
+    cmp g_spriteCounter, 20
+    jne gAnimRet
+    xor g_altSprite, 1
+    mov g_spriteCounter, 0
+    gAnimRet:
+        ret
+g_ANIMATEPLAYER ENDP
 
 g_PLEFTWARD PROC NEAR
     push AX
@@ -183,17 +206,27 @@ g_PRIGHTWARD ENDP
 
 g_SHOOT PROC NEAR
     push AX
+    push BX
     
+    mov  AL, playerRight
+    mov  projRight, AL
+
     mov  AX, playerX
-    add  AX, g_playerSize
-    add  AX, g_projSpeed
+    mov  BX, g_playerSize
+    sar  BX, 1      ; div by 2
+    cmp  playerRight, 0
+    jz   shootLeft
+    add  AX, BX
+    jmp  shootNext
+    shootLeft:
+         sub AX, BX
+    shootNext:
     mov  projX, AX
 
-    mov  AX, g_playerSize
-    sar  AX, 1      ; div by 2
-    add  AX, playerY
+    mov  AX, playerY
     mov  projY, AX
 
+    pop  BX
     pop  AX
 
     mov g_projShow, 1

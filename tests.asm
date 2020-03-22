@@ -1,6 +1,5 @@
 .286
 
-; Stack Segment
 SSEG     SEGMENT STACK
          DB      32      DUP("STACK---")
 SSEG     ENDS
@@ -87,6 +86,8 @@ MAIN     PROC FAR
          call oxj_FRM
 
          oxgCLEAR
+
+         call g_ANIMATEPLAYER
 
          call g_DRAWPLAYER
 
