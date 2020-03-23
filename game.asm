@@ -10,8 +10,9 @@ DSEG        SEGMENT
     projY           DW 0
     projRight       DB 1
 
-    mobsX           DW 5,25,45,65
+    mobsX           DW   5,  25,  45,  65
     mobsY           DW 100, 100, 100, 100
+    mobsShowing     DB 1, 1, 1, 1
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -177,6 +178,7 @@ g_ANIMATEPLAYER ENDP
 g_PFORWARD PROC NEAR
     push AX
     push BX
+    
     mov  g_lastDepl, 1
     mov  g_moveFrames, 0
     mov  AX, playerY
@@ -189,10 +191,11 @@ g_PFORWARD PROC NEAR
     moveFor:        
          sub  AX, _g_playerSpeed 
          mov  playerY, AX
-    finallyFor:        pop  BX
-        pop  AX
-
-        ret
+    finallyFor:        
+         pop  BX
+         pop  AX
+ 
+         ret
 g_PFORWARD ENDP
 
 g_PLEFTWARD PROC NEAR
@@ -345,6 +348,29 @@ g_MENU PROC NEAR
 g_MENU ENDP
 
 g_DRAWMOBS PROC NEAR
-    
+    cmp  mobsShowing, 0
+    jne  drawFirVirus
+    cmp  mobsShowing+2, 0
+    jne  drawSecVirus
+    cmp  mobsShowing+4, 0
+    jne  drawThiVirus
+    cmp  mobsShowing+6, 0
+    jne  drawFouVirus
+
+    drawFirVirus:
+         g_DRAWVIRUS mobsX, mobsY
+         jmp  nextDraw
+    drawSecVirus:
+         g_DRAWVIRUS mobsX+2, mobsY+2
+         jmp  nextDraw
+    drawThiVirus:
+         g_DRAWVIRUS mobsX+4, mobsY+4
+         jmp  nextDraw
+    drawFouVirus:
+         g_DRAWVIRUS mobsX+6, mobsY+6
+         jmp  nextDraw
+
+    nextDraw:
+         
     ret
 g_DRAWMOBS ENDP

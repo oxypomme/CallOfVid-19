@@ -97,12 +97,13 @@ MAIN     PROC FAR
          jnz  drawProj
          jmp  ndrawProj
 
-         drawProj: call g_DRAWBULLET
+         drawProj: 
+              call g_DRAWBULLET
          ndrawProj:
-         push AX
-         mov  AH, 01h ; on veut vérifier si une touche est appuyée
-         int  16h     ; on vérifie si une touche est appuyée
-         jz   draw
+              push AX
+              mov  AH, 01h ; on veut vérifier si une touche est appuyée
+              int  16h     ; on vérifie si une touche est appuyée
+              jz   draw
          
          ; on récupère la touche appuyée dans AH
          call oxj_GETKEY
