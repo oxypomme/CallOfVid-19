@@ -1,4 +1,4 @@
 oxylib/
-.vscode/
 *.exe
 *.obj
+.vsls.json
