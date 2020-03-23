@@ -26,7 +26,7 @@ MAIN     PROC FAR
     push DS
     push 0
 
-    ; Registre
+    ; Registre<
     mov  AX, DSEG
     mov  DS, AX
 

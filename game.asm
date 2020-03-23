@@ -23,24 +23,35 @@ DSEG        SEGMENT
     g_projShow      DB 0
     g_altSprite     DB 0
     g_spriteCounter DW 0
+    g_fireFrames DW 60
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
     cmp  playerRight, 0
     jnz  gPdrawR
 
+    cmp g_fireFrames, 30
+    jbe gPdrawFireL
     cmp g_altSprite, 0
     jnz gPdrawAltL
     %include assets/drawPl.asm
     jmp gPdrawEnd
+    gPdrawFireL:
+        %include assets/drawPlF.asm
+        jmp  gPdrawEnd
     gPdrawAltL:
         %include assets/drawPlA.asm
         jmp  gPdrawEnd
 
     gPdrawR:
+        cmp g_fireFrames, 30
+        jbe gPdrawFireR
         cmp g_altSprite, 0
         jnz gPdrawAltR
         %include assets/drawPr.asm
+        jmp  gPdrawEnd
+    gPdrawFireR:
+        %include assets/drawPrF.asm
         jmp  gPdrawEnd
     gPdrawAltR:
         %include assets/drawPrA.asm
@@ -127,6 +138,10 @@ g_PFORWARD ENDP
 
 g_ANIMATEPLAYER PROC NEAR
     inc g_spriteCounter
+    cmp g_fireFrames, 60
+    ja gAnimSkipFireFrames
+    inc g_fireFrames
+    gAnimSkipFireFrames:
     cmp g_spriteCounter, 40
     jne gAnimRet
     xor g_altSprite, 1
@@ -208,6 +223,8 @@ g_SHOOT PROC NEAR
     push AX
     push BX
     
+    mov g_fireFrames, 0
+
     mov  AL, playerRight
     mov  projRight, AL
 
