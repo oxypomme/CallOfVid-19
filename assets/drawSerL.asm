@@ -5,15 +5,7 @@ mov  AX, projX
 mov  BX, projY
 
 
-inc  AX
-mov  BX, projY
-
-
-inc  AX
-mov  BX, projY
-
-
-inc  AX
+add  AX, 3
 mov  BX, projY
 
 add  BX, 8
@@ -80,25 +72,6 @@ inc  BX
 oxgSHOWPIXEL AX, BX, 00Fh	; 10-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Fh	; 10-9
-
-inc  AX
-mov  BX, projY
-
-
-inc  AX
-mov  BX, projY
-
-
-inc  AX
-mov  BX, projY
-
-
-inc  AX
-mov  BX, projY
-
-
-inc  AX
-mov  BX, projY
 
 
 pop  BX
