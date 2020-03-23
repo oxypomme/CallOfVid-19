@@ -5,13 +5,47 @@ mov  AX, playerX
 mov  BX, playerY
 
 
-add  AX, 7
+inc  AX
+mov  BX, playerY
+
+
+inc  AX
+mov  BX, playerY
+
+
+inc  AX
+mov  BX, playerY
+
+
+inc  AX
+mov  BX, playerY
+
+add  BX, 8
+oxgSHOWPIXEL AX, BX, 007h	; 4-8
+
+inc  AX
 mov  BX, playerY
 
 add  BX, 7
-oxgSHOWPIXEL AX, BX, 006h	; 7-7
+oxgSHOWPIXEL AX, BX, 007h	; 5-7
 inc  BX
-oxgSHOWPIXEL AX, BX, 006h	; 7-8
+oxgSHOWPIXEL AX, BX, 007h	; 5-8
+
+inc  AX
+mov  BX, playerY
+
+add  BX, 7
+oxgSHOWPIXEL AX, BX, 007h	; 6-7
+inc  BX
+oxgSHOWPIXEL AX, BX, 007h	; 6-8
+
+inc  AX
+mov  BX, playerY
+
+add  BX, 7
+oxgSHOWPIXEL AX, BX, 007h	; 7-7
+inc  BX
+oxgSHOWPIXEL AX, BX, 007h	; 7-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 007h	; 7-9
 add  BX, 6
@@ -23,8 +57,10 @@ mov  BX, playerY
 add  BX, 6
 oxgSHOWPIXEL AX, BX, 006h	; 8-6
 inc  BX
-oxgSHOWPIXEL AX, BX, 006h	; 8-7
-add  BX, 7
+oxgSHOWPIXEL AX, BX, 032h	; 8-7
+inc  BX
+oxgSHOWPIXEL AX, BX, 007h	; 8-8
+add  BX, 6
 oxgSHOWPIXEL AX, BX, 001h	; 8-14
 inc  BX
 oxgSHOWPIXEL AX, BX, 007h	; 8-15
@@ -38,7 +74,11 @@ add  BX, 2
 oxgSHOWPIXEL AX, BX, 006h	; 9-5
 inc  BX
 oxgSHOWPIXEL AX, BX, 006h	; 9-6
-add  BX, 5
+inc  BX
+oxgSHOWPIXEL AX, BX, 032h	; 9-7
+inc  BX
+oxgSHOWPIXEL AX, BX, 00Fh	; 9-8
+add  BX, 3
 oxgSHOWPIXEL AX, BX, 001h	; 9-11
 inc  BX
 oxgSHOWPIXEL AX, BX, 001h	; 9-12
@@ -62,9 +102,9 @@ oxgSHOWPIXEL AX, BX, 006h	; 10-5
 inc  BX
 oxgSHOWPIXEL AX, BX, 006h	; 10-6
 inc  BX
-oxgSHOWPIXEL AX, BX, 006h	; 10-7
+oxgSHOWPIXEL AX, BX, 00Fh	; 10-7
 inc  BX
-oxgSHOWPIXEL AX, BX, 006h	; 10-8
+oxgSHOWPIXEL AX, BX, 00Fh	; 10-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 006h	; 10-9
 inc  BX
@@ -89,9 +129,9 @@ oxgSHOWPIXEL AX, BX, 00Ch	; 11-5
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 11-6
 inc  BX
-oxgSHOWPIXEL AX, BX, 00Ch	; 11-7
+oxgSHOWPIXEL AX, BX, 00Fh	; 11-7
 inc  BX
-oxgSHOWPIXEL AX, BX, 00Ch	; 11-8
+oxgSHOWPIXEL AX, BX, 00Fh	; 11-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 11-9
 inc  BX
@@ -117,7 +157,7 @@ oxgSHOWPIXEL AX, BX, 00Ch	; 12-6
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 12-7
 inc  BX
-oxgSHOWPIXEL AX, BX, 00Ch	; 12-8
+oxgSHOWPIXEL AX, BX, 00Fh	; 12-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 12-9
 inc  BX
@@ -134,7 +174,11 @@ add  BX, 5
 oxgSHOWPIXEL AX, BX, 00Ch	; 13-5
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 13-6
-add  BX, 7
+add  BX, 2
+oxgSHOWPIXEL AX, BX, 00Fh	; 13-8
+inc  BX
+oxgSHOWPIXEL AX, BX, 00Fh	; 13-9
+add  BX, 4
 oxgSHOWPIXEL AX, BX, 036h	; 13-13
 add  BX, 2
 oxgSHOWPIXEL AX, BX, 01Dh	; 13-15
@@ -146,7 +190,9 @@ add  BX, 6
 oxgSHOWPIXEL AX, BX, 00Ch	; 14-6
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 14-7
-add  BX, 7
+add  BX, 2
+oxgSHOWPIXEL AX, BX, 00Fh	; 14-9
+add  BX, 5
 oxgSHOWPIXEL AX, BX, 036h	; 14-14
 inc  BX
 oxgSHOWPIXEL AX, BX, 01Dh	; 14-15

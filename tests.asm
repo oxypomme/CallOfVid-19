@@ -89,8 +89,8 @@ MAIN     PROC FAR
 
          oxgCLEAR
 
+         call g_DRAWMOBS
          call g_ANIMATEPLAYER
-
          call g_DRAWPLAYER
 
          cmp  g_projShow, 0

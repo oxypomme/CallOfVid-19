@@ -10,6 +10,9 @@ DSEG        SEGMENT
     projY           DW 0
     projRight       DB 1
 
+    mobsX           DW 5,25,45,65
+    mobsY           DW 100, 100, 100, 100
+
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
     playBtn         DB "Play"
@@ -340,3 +343,8 @@ g_MENU PROC NEAR
     pop  AX
     ret
 g_MENU ENDP
+
+g_DRAWMOBS PROC NEAR
+    
+    ret
+g_DRAWMOBS ENDP
