@@ -13,17 +13,25 @@ DSEG        SEGMENT
     l_titleLbl      EQU $-titleLbl
     playBtn         DB "Play"
     l_playBtn       EQU $-playBtn
+    _PLAYy_         EQU 92
     quitBtn         DB "Quit"
     l_quitBtn       EQU $-quitBtn
+    _QUITy_         EQU 115
 
-    g_playerSize    DW 16
-    g_playerSpeed   DW 8
-    g_projSize      DW 16
-    g_projSpeed     DW 1
+    _g_playerSize   DW 16
+    _g_playerSpeed  DW 8
+    _g_projSize     DW 16
+    _g_projSpeed    DW 2
+    _g_virSize      DW 16
+    _g_virSpeed     DW 1
+
     g_projShow      DB 0
     g_altSprite     DB 0
     g_spriteCounter DW 0
-    g_fireFrames DW 60
+    g_fireFrames    DW 60
+    g_cursY         DW _PLAYy_
+    g_moveFrames DW 60
+    g_lastDepl DW 0
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
@@ -80,10 +88,10 @@ ANIMATEBULLETR PROC NEAR
     push AX
 
     mov  AX, projX
-    add  AX, g_projSpeed
+    add  AX, _g_projSpeed
     mov  projX, AX
     mov  AX, 140h
-    sub  AX, g_projSize
+    sub  AX, _g_projSize
     cmp  projX, AX
     jl   endBAnimR
 
@@ -98,10 +106,10 @@ ANIMATEBULLETL PROC NEAR
     push AX
 
     mov  AX, projX
-    sub  AX, g_projSpeed
+    sub  AX, _g_projSpeed
     mov  projX, AX
     mov  AX, 0h
-    ;add  AX, g_projSize
+    ;add  AX, _g_projSize
     cmp  projX, AX
     jg   endBAnimL
 
@@ -120,17 +128,14 @@ g_PFORWARD PROC NEAR
 
     mov  AX, playerY
     mov  BX, 0h
-    ;add  BX, g_playerSize
+    ;add  BX, _g_playerSize
     cmp  AX, BX
     jne  moveFor
     jmp  finallyFor
 
-    moveFor:
-        sub  AX, g_playerSpeed  
+    moveFor:        sub  AX, _g_playerSpeed 
         mov  playerY, AX
-
-    finallyFor:
-        pop  BX
+    finallyFor:        pop  BX
         pop  AX
 
         ret
@@ -157,17 +162,14 @@ g_PLEFTWARD PROC NEAR
 
     mov  AX, playerX
     mov  BX, 0h
-    ;add  BX, g_playerSize
+    ;add  BX, _g_playerSize
     cmp  AX, BX
     jne  moveRig
     jmp  finallyRig
 
-    moveRig:
-        sub  AX, g_playerSpeed  
+    moveRig:        sub  AX, _g_playerSpeed 
         mov  playerX, AX
-
-    finallyRig:
-        pop  BX
+    finallyRig:        pop  BX
         pop  AX
 
         ret
@@ -179,17 +181,14 @@ g_PBACKWARD PROC NEAR
 
     mov  AX, playerY
     mov  BX, 0B8h
-    ;sub  BX, g_playerSize
+    ;sub  BX, _g_playerSize
     cmp  AX, BX
     jne  moveBac
     jmp  finallyBac
     
-    moveBac:
-        add  AX, g_playerSpeed  
+    moveBac:        add  AX, _g_playerSpeed 
         mov  playerY, AX
-
-    finallyBac:
-        pop  BX
+    finallyBac:        pop  BX
         pop  AX
 
         ret
@@ -202,18 +201,15 @@ g_PRIGHTWARD PROC NEAR
 
     mov  AX, playerX
     mov  BX, 140h
-    sub  BX, g_playerSize
-    ;sub  BX, g_playerSize
+    sub  BX, _g_playerSize
+    ;sub  BX, _g_playerSize
     cmp  AX, BX
     jne  moveLef
     jmp  finallyLef
 
-    moveLef:
-        add  AX, g_playerSpeed  
+    moveLef:        add  AX, _g_playerSpeed 
         mov  playerX, AX
-
-    finallyLef:
-        pop  BX
+    finallyLef:        pop  BX
         pop  AX
 
         ret
@@ -229,7 +225,7 @@ g_SHOOT PROC NEAR
     mov  projRight, AL
 
     mov  AX, playerX
-    mov  BX, g_playerSize
+    mov  BX, _g_playerSize
     sar  BX, 1      ; div by 2
     cmp  playerRight, 0
     jz   shootLeft
@@ -284,6 +280,9 @@ g_MENU PROC NEAR
     int  21h
     oxgSETCURSOR 0, 0
 
+
+    mov  DX, g_cursY
+    sub  DX, _g_virSize
     g_DRAWVIRUS 122, DX
 
     pop  DX

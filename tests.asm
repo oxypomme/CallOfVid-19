@@ -6,7 +6,6 @@ SSEG     ENDS
 
 ; Data Segment
 DSEG     SEGMENT
-    cursY           DW 92
     keyPressed      DB 0
     tmp             DW 0
 DSEG     ENDS
@@ -66,17 +65,17 @@ MAIN     PROC FAR
          jmp  menu
 
          menu_down:
-              cmp  cursY, 100
+              cmp  g_cursY, 100
               jg   menu
-              mov  cursY, 115
+              mov  g_cursY, _QUITy_
               jmp  menu
          menu_up:
-              cmp  cursY, 100
+              cmp  g_cursY, 100
               jl   menu
-              mov  cursY, 92
+              mov  g_cursY, _PLAYy_
               jmp  menu
          menu_next:
-              cmp  cursY, 100
+              cmp  g_cursY, 100
               push AX
               jl   draw
               jmp  endprog
