@@ -39,41 +39,61 @@ g_DRAWPLAYER PROC NEAR
     cmp  playerRight, 0
     jnz  gPdrawR
 
-    cmp g_fireFrames, 30
-    jbe gPdrawFireL
-    cmp g_moveFrames, 30
-    jbe gPdrawMoveL
-    cmp g_altSprite, 0
-    jnz gPdrawAltL
+    cmp  g_fireFrames, 30
+    jbe  gPdrawFireL
+    cmp  g_moveFrames, 30
+    jbe  gPdrawMoveL
+    cmp  g_altSprite, 0
+    jnz  gPdrawAltL
     %include assets/drawPl.asm
-    jmp gPdrawEnd
+    jmp  gPdrawEnd
     gPdrawFireL:
-        %include assets/drawPlF.asm
-        jmp  gPdrawEnd
+         %include assets/drawPlF.asm
+         jmp  gPdrawEnd
     gPdrawMoveL:
-        
-        gPgrawMLeft:
-            %include assets/drawPMol.asm
-            jmp  gPdrawEnd
-        gPgrawULeft:
-            %include assets/drawPMol.asm
-            jmp  gPdrawEnd
+         cmp g_lastDepl, 1
+         je  gPdrawULeft
+         cmp g_lastDepl, 2
+         je  gPdrawDLeft
+         %include assets/drawPMoL.asm
+         jmp  gPdrawEnd
+         gPdrawULeft:
+              %include assets/drawPUpL.asm
+              jmp  gPdrawEnd
+         gPdrawDLeft:
+              %include assets/drawPDoL.asm
+              jmp  gPdrawEnd
     gPdrawAltL:
-        %include assets/drawPlA.asm
-        jmp  gPdrawEnd
+         %include assets/drawPlA.asm
+         jmp  gPdrawEnd
 
     gPdrawR:
-        cmp g_fireFrames, 30
-        jbe gPdrawFireR
-        cmp g_altSprite, 0
-        jnz gPdrawAltR
-        %include assets/drawPr.asm
-        jmp  gPdrawEnd
+         cmp g_fireFrames, 30
+         jbe gPdrawFireR
+         cmp g_moveFrames, 30
+         jbe gPdrawMoveR
+         cmp g_altSprite, 0
+         jnz gPdrawAltR
+         %include assets/drawPr.asm
+         jmp  gPdrawEnd
+    gPdrawMoveR:
+         cmp g_lastDepl, 1
+         je  gPdrawURight
+         cmp g_lastDepl, 2
+         je  gPdrawDRight
+         %include assets/drawPMoR.asm
+         jmp  gPdrawEnd
+         gPdrawURight:
+              %include assets/drawPUpR.asm
+              jmp  gPdrawEnd
+         gPdrawDRight:
+              %include assets/drawPDoR.asm
+              jmp  gPdrawEnd
     gPdrawFireR:
-        %include assets/drawPrF.asm
-        jmp  gPdrawEnd
+         %include assets/drawPrF.asm
+         jmp  gPdrawEnd
     gPdrawAltR:
-        %include assets/drawPrA.asm
+         %include assets/drawPrA.asm
 
     gPdrawEnd:
          ret
@@ -127,16 +147,35 @@ ANIMATEBULLETL PROC NEAR
     mov  g_projShow, 0
 
     endBAnimL:
-        pop  AX
-        ret
+         pop  AX
+         ret
 ANIMATEBULLETL ENDP
+
+g_ANIMATEPLAYER PROC NEAR
+    inc  g_spriteCounter
+    cmp  g_fireFrames, 60
+    ja   gAnimSkipFireFrames
+    inc  g_fireFrames
+    gAnimSkipFireFrames:
+         cmp g_moveFrames, 60
+         ja gAnimSkipMoveFrames
+         inc g_moveFrames
+         gAnimSkipMoveFrames:
+            cmp g_spriteCounter, 40
+            jne gAnimRet
+            xor g_altSprite, 1
+            mov g_spriteCounter, 0
+    gAnimRet:
+        ret
+g_ANIMATEPLAYER ENDP
 
 %include assets/drawVir.asm
 
 g_PFORWARD PROC NEAR
     push AX
     push BX
-
+    mov  g_lastDepl, 1
+    mov  g_moveFrames, 0
     mov  AX, playerY
     mov  BX, 0h
     ;add  BX, _g_playerSize
@@ -144,33 +183,22 @@ g_PFORWARD PROC NEAR
     jne  moveFor
     jmp  finallyFor
 
-    moveFor:        sub  AX, _g_playerSpeed 
-        mov  playerY, AX
+    moveFor:        
+         sub  AX, _g_playerSpeed 
+         mov  playerY, AX
     finallyFor:        pop  BX
         pop  AX
 
         ret
 g_PFORWARD ENDP
 
-g_ANIMATEPLAYER PROC NEAR
-    inc g_spriteCounter
-    cmp g_fireFrames, 60
-    ja gAnimSkipFireFrames
-    inc g_fireFrames
-    gAnimSkipFireFrames:
-    cmp g_spriteCounter, 40
-    jne gAnimRet
-    xor g_altSprite, 1
-    mov g_spriteCounter, 0
-    gAnimRet:
-        ret
-g_ANIMATEPLAYER ENDP
-
 g_PLEFTWARD PROC NEAR
     push AX
     push BX
-    mov playerRight, 0
-
+    mov  playerRight, 0
+ 
+    mov  g_lastDepl, 0
+    mov  g_moveFrames, 0
     mov  AX, playerX
     mov  BX, 0h
     ;add  BX, _g_playerSize
@@ -178,18 +206,22 @@ g_PLEFTWARD PROC NEAR
     jne  moveRig
     jmp  finallyRig
 
-    moveRig:        sub  AX, _g_playerSpeed 
-        mov  playerX, AX
-    finallyRig:        pop  BX
-        pop  AX
+    moveRig:        
+         sub  AX, _g_playerSpeed 
+         mov  playerX, AX
+    finallyRig:     
+         pop  BX
+         pop  AX
 
-        ret
+         ret
 g_PLEFTWARD ENDP
 
 g_PBACKWARD PROC NEAR
     push AX
     push BX
 
+    mov g_lastDepl, 2
+    mov g_moveFrames, 0
     mov  AX, playerY
     mov  BX, 0B8h
     ;sub  BX, _g_playerSize
@@ -197,19 +229,23 @@ g_PBACKWARD PROC NEAR
     jne  moveBac
     jmp  finallyBac
     
-    moveBac:        add  AX, _g_playerSpeed 
-        mov  playerY, AX
-    finallyBac:        pop  BX
-        pop  AX
+    moveBac:        
+         add  AX, _g_playerSpeed 
+         mov  playerY, AX
+    finallyBac:
+         pop  BX
+         pop  AX
 
-        ret
+         ret
 g_PBACKWARD ENDP
 
 g_PRIGHTWARD PROC NEAR
     push AX
     push BX
-    mov playerRight, 1
+    mov  playerRight, 1
 
+    mov  g_lastDepl, 0
+    mov  g_moveFrames, 0
     mov  AX, playerX
     mov  BX, 140h
     sub  BX, _g_playerSize
@@ -218,19 +254,21 @@ g_PRIGHTWARD PROC NEAR
     jne  moveLef
     jmp  finallyLef
 
-    moveLef:        add  AX, _g_playerSpeed 
-        mov  playerX, AX
-    finallyLef:        pop  BX
-        pop  AX
-
-        ret
+    moveLef:
+         add  AX, _g_playerSpeed 
+         mov  playerX, AX
+    finallyLef:
+         pop  BX
+         pop  AX
+ 
+         ret
 g_PRIGHTWARD ENDP
 
 g_SHOOT PROC NEAR
     push AX
     push BX
     
-    mov g_fireFrames, 0
+    mov  g_fireFrames, 0
 
     mov  AL, playerRight
     mov  projRight, AL
