@@ -1,3 +1,4 @@
+%include oxylib/oxysound.asm
 %include oxylib/oxygame.asm
 
 DSEG        SEGMENT
@@ -30,8 +31,8 @@ DSEG        SEGMENT
     g_spriteCounter DW 0
     g_fireFrames    DW 60
     g_cursY         DW _PLAYy_
-    g_moveFrames DW 60
-    g_lastDepl DW 0
+    g_moveFrames    DW 60
+    g_lastDepl      DW 0
 DSEG        ENDS
 
 g_DRAWPLAYER PROC NEAR
@@ -40,6 +41,8 @@ g_DRAWPLAYER PROC NEAR
 
     cmp g_fireFrames, 30
     jbe gPdrawFireL
+    cmp g_moveFrames, 30
+    jbe gPdrawMoveL
     cmp g_altSprite, 0
     jnz gPdrawAltL
     %include assets/drawPl.asm
@@ -47,6 +50,14 @@ g_DRAWPLAYER PROC NEAR
     gPdrawFireL:
         %include assets/drawPlF.asm
         jmp  gPdrawEnd
+    gPdrawMoveL:
+        
+        gPgrawMLeft:
+            %include assets/drawPMol.asm
+            jmp  gPdrawEnd
+        gPgrawULeft:
+            %include assets/drawPMol.asm
+            jmp  gPdrawEnd
     gPdrawAltL:
         %include assets/drawPlA.asm
         jmp  gPdrawEnd

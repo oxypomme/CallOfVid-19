@@ -68,13 +68,16 @@ MAIN     PROC FAR
               cmp  g_cursY, 100
               jg   menu
               mov  g_cursY, _QUITy_
+              oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_up:
               cmp  g_cursY, 100
               jl   menu
               mov  g_cursY, _PLAYy_
+              oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_next:
+              oxsPLAYSOUND _B_, 1
               cmp  g_cursY, 100
               push AX
               jl   draw
@@ -146,6 +149,7 @@ MAIN     PROC FAR
               call g_PRIGHTWARD  
               jmp  draw
          SPACEpressed:
+              oxsPLAYSOUND _A_, 1
               call g_SHOOT
               jmp  draw
 
