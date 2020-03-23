@@ -5,23 +5,7 @@ mov  AX, playerX
 mov  BX, playerY
 
 
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
+add  AX, 5
 mov  BX, playerY
 
 add  BX, 3
@@ -174,13 +158,6 @@ inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 13-4
 inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 13-5
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
 
 
 pop  BX

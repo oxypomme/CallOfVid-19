@@ -5,31 +5,7 @@ mov  AX, playerX
 mov  BX, playerY
 
 
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
-mov  BX, playerY
-
-
-inc  AX
+add  AX, 7
 mov  BX, playerY
 
 add  BX, 7
