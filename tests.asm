@@ -14,9 +14,6 @@ DSEG     ENDS
 CSEG     SEGMENT 'CODE'
 ASSUME   CS:CSEG, DS:DSEG, SS:SSEG
 
-;%include oxylib/oxygraph.asm
-;%include oxylib/oxylib.asm
-;include oxylib/oxygame.asm
 %include game.asm
 ;%include oxylib/oxyrand.asm
 
@@ -149,7 +146,6 @@ MAIN     PROC FAR
               call g_PRIGHTWARD  
               jmp  draw
          SPACEpressed:
-              oxsPLAYSOUND _A_, 1
               call g_SHOOT
               jmp  draw
 
