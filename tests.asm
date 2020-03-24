@@ -80,26 +80,25 @@ MAIN     PROC FAR
               oxsPLAYSOUND _B_, 1
               cmp  g_cursY, 100
               push AX
-              jl   draw
+              jl   init_draw
               jmp  endprog
+    init_draw:
+         oxgCLEAR
     draw:
          pop  AX
          mov  oxj_framerate, 25
          call oxj_FRM
-
-         oxgCLEAR
-
-         call g_DRAWMOBS
          call g_ANIMATEPLAYER
-         call g_DRAWPLAYER
+
+         ; oxgCLEAR
 
          cmp  g_projShow, 0
-         jnz  drawProj
-         jmp  ndrawProj
+         jz  ndrawProj
 
-         drawProj: 
-              call g_DRAWBULLET
+         call g_DRAWBULLET
          ndrawProj:
+              call g_DRAWMOBS
+              ; call g_DRAWPLAYER
               push AX
               mov  AH, 01h ; on veut vérifier si une touche est appuyée
               int  16h     ; on vérifie si une touche est appuyée

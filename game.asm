@@ -10,9 +10,9 @@ DSEG        SEGMENT
     projY           DW 0
     projRight       DB 1
 
-    mobsX           DW   5,  25,  45,  65
-    mobsY           DW 100, 100, 100, 100
-    mobsShowing     DB 1, 1, 1, 1
+    mobsX           DW   65,  85,  105,  125
+    mobsY           DW 100, 50, 150, 25
+    mobsShowing     DB   1,   0,   0,   0
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -104,16 +104,45 @@ g_DRAWPLAYER PROC NEAR
 g_DRAWPLAYER ENDP
 
 g_DRAWBULLET PROC NEAR
+
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, projX
+     mov BX, projY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 2
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
+
     cmp  projRight, 0
+    jnz  gBanimR
+    call ANIMATEBULLETL
+    jmp  gBanimEnd
+    gBanimR:
+         call ANIMATEBULLETR
+    gBanimEnd:
+
+     cmp g_projShow, 0
+     je gBdrawEnd 
+    cmp  projRight, 0
+
     jnz  gBdrawR
 
     %include assets/drawSerL.asm
-    call ANIMATEBULLETL
     jmp  gBdrawEnd
 
     gBdrawR:
          %include assets/drawSerR.asm
-         call ANIMATEBULLETR
     
     gBdrawEnd:
          ret
@@ -128,7 +157,81 @@ ANIMATEBULLETR PROC NEAR
     mov  AX, 140h
     sub  AX, _g_projSize
     cmp  projX, AX
+    jl   isOnMobOneR
+
+    mov  g_projShow, 0
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, projX
+     mov BX, projY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 1
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
+
+    isOnMobOneR:
+    cmp  mobsShowing, 0
+    jz   isOnMobTwoR
+    mov  AX, mobsY
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jl   isOnMobTwoR
+    mov  AX, mobsX
+    cmp  projX, AX
+    jl   isOnMobTwoR
+    mov  mobsShowing, 0
+
+    mov  g_projShow, 0
+
+    isOnMobTwoR:
+    cmp  mobsShowing+2, 0
+    jz   isOnMobThrR
+    mov  AX, mobsY+2
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jl   isOnMobThrR
+    mov  AX, mobsX+2
+    cmp  projX, AX
+    jl   isOnMobThrR
+    mov  mobsShowing+2, 0
+
+    mov  g_projShow, 0
+
+    isOnMobThrR:
+    cmp  mobsShowing+4, 0
+    jz   isOnMobFouR
+    mov  AX, mobsY+4
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jl   isOnMobFouR
+    mov  AX, mobsX+4
+    cmp  projX, AX
+    jl   isOnMobFouR
+    mov  mobsShowing+4, 0
+
+    mov  g_projShow, 0
+
+    isOnMobFouR:
+    cmp  mobsShowing+6, 0
+    jz   endBAnimR
+    mov  AX, mobsY+6
+    add  AX, _g_virSize
+    cmp  projY, AX
     jl   endBAnimR
+    mov  AX, mobsX+6
+    cmp  projX, AX
+    jl   endBAnimR
+    mov  mobsShowing+6, 0
 
     mov  g_projShow, 0
 
@@ -149,6 +252,24 @@ ANIMATEBULLETL PROC NEAR
     jg   endBAnimL
 
     mov  g_projShow, 0
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, projX
+     mov BX, projY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 2
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
 
     endBAnimL:
          pop  AX
@@ -170,6 +291,26 @@ g_ANIMATEPLAYER PROC NEAR
             xor g_altSprite, 1
             mov g_spriteCounter, 0
     gAnimRet:
+          push AX
+          push BX
+          push CX
+          push DX
+          mov AX, playerX
+          mov BX, playerY
+          sar AX, 3
+          sar BX, 3
+          mov CL, AL
+          mov CH, BL
+          mov DX, CX
+          add DL, 1
+          add DH, 1
+          oxgFILLS CL, CH, DL, DH, _BLACK_
+          pop DX
+          pop CX
+          pop BX
+          pop AX
+         call g_DRAWPLAYER
+
         ret
 g_ANIMATEPLAYER ENDP
 
@@ -178,7 +319,26 @@ g_ANIMATEPLAYER ENDP
 g_PFORWARD PROC NEAR
     push AX
     push BX
-    
+
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, playerX
+     mov BX, playerY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 1
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
+
     mov  g_lastDepl, 1
     mov  g_moveFrames, 0
     mov  AX, playerY
@@ -191,7 +351,8 @@ g_PFORWARD PROC NEAR
     moveFor:        
          sub  AX, _g_playerSpeed 
          mov  playerY, AX
-    finallyFor:        
+    finallyFor: 
+         call g_DRAWPLAYER       
          pop  BX
          pop  AX
  
@@ -202,6 +363,26 @@ g_PLEFTWARD PROC NEAR
     push AX
     push BX
     mov  playerRight, 0
+
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, playerX
+     mov BX, playerY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 1
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
+
  
     mov  g_lastDepl, 0
     mov  g_moveFrames, 0
@@ -215,7 +396,8 @@ g_PLEFTWARD PROC NEAR
     moveRig:        
          sub  AX, _g_playerSpeed 
          mov  playerX, AX
-    finallyRig:     
+    finallyRig:
+         call g_DRAWPLAYER       
          pop  BX
          pop  AX
 
@@ -225,6 +407,25 @@ g_PLEFTWARD ENDP
 g_PBACKWARD PROC NEAR
     push AX
     push BX
+
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, playerX
+     mov BX, playerY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 1
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
 
     mov g_lastDepl, 2
     mov g_moveFrames, 0
@@ -239,6 +440,7 @@ g_PBACKWARD PROC NEAR
          add  AX, _g_playerSpeed 
          mov  playerY, AX
     finallyBac:
+         call g_DRAWPLAYER       
          pop  BX
          pop  AX
 
@@ -249,6 +451,25 @@ g_PRIGHTWARD PROC NEAR
     push AX
     push BX
     mov  playerRight, 1
+
+     push AX
+     push BX
+     push CX
+     push DX
+     mov AX, playerX
+     mov BX, playerY
+     sar AX, 3
+     sar BX, 3
+     mov CL, AL
+     mov CH, BL
+     mov DX, CX
+     add DL, 1
+     add DH, 1
+     oxgFILLS CL, CH, DL, DH, _BLACK_
+     pop DX
+     pop CX
+     pop BX
+     pop AX
 
     mov  g_lastDepl, 0
     mov  g_moveFrames, 0
@@ -264,6 +485,7 @@ g_PRIGHTWARD PROC NEAR
          add  AX, _g_playerSpeed 
          mov  playerX, AX
     finallyLef:
+         call g_DRAWPLAYER       
          pop  BX
          pop  AX
  
@@ -348,27 +570,22 @@ g_MENU PROC NEAR
 g_MENU ENDP
 
 g_DRAWMOBS PROC NEAR
-    cmp  mobsShowing, 0
-    jne  drawFirVirus
-    cmp  mobsShowing+2, 0
-    jne  drawSecVirus
-    cmp  mobsShowing+4, 0
-    jne  drawThiVirus
-    cmp  mobsShowing+6, 0
-    jne  drawFouVirus
 
-    drawFirVirus:
-         g_DRAWVIRUS mobsX, mobsY
-         jmp  nextDraw
+    cmp  mobsShowing, 0
+    je   drawSecVirus
+    g_DRAWVIRUS mobsX, mobsY
     drawSecVirus:
+         cmp  mobsShowing+2, 0
+         je   drawThiVirus
          g_DRAWVIRUS mobsX+2, mobsY+2
-         jmp  nextDraw
     drawThiVirus:
+         cmp  mobsShowing+4, 0
+         je   drawFouVirus
          g_DRAWVIRUS mobsX+4, mobsY+4
-         jmp  nextDraw
     drawFouVirus:
+         cmp  mobsShowing+6, 0
+         je   nextDraw
          g_DRAWVIRUS mobsX+6, mobsY+6
-         jmp  nextDraw
 
     nextDraw:
          
