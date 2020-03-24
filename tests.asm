@@ -81,6 +81,7 @@ MAIN     PROC FAR
               jmp  endprog
     init_draw:
          oxgCLEAR
+         call g_INIT
     draw:
          pop  AX
          mov  oxj_framerate, 25

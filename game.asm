@@ -2,17 +2,17 @@
 %include oxylib/oxygame.asm
 
 DSEG        SEGMENT
-    playerX         DW 32
-    playerY         DW 32
-    playerRight     DB 1
+    playerX         DW ?
+    playerY         DW ?
+    playerRight     DB ?
 
-    projX           DW 0
-    projY           DW 0
-    projRight       DB 1
+    projX           DW ?
+    projY           DW ?
+    projRight       DB ?
 
-    mobsX           DW 65, 85, 105, 125
-    mobsY           DW 100, 100, 100, 100
-    mobsShowing     DW 1, 1, 1, 1
+    mobsX           DW ?, ?, ?, ?
+    mobsY           DW ?, ?, ?, ?
+    mobsShowing     DW ?, ?, ?, ?
 
     titleLbl        DB "Call Of Vid-19"
     l_titleLbl      EQU $-titleLbl
@@ -23,21 +23,54 @@ DSEG        SEGMENT
     l_quitBtn       EQU $-quitBtn
     _QUITy_         EQU 115
 
-    _g_playerSize   DW 16
-    _g_playerSpeed  DW 8
-    _g_projSize     DW 16
-    _g_projSpeed    DW 2
-    _g_virSize      DW 16
-    _g_virSpeed     DW 1
+    _g_playerSize   DW ?
+    _g_playerSpeed  DW ?
+    _g_projSize     DW ?
+    _g_projSpeed    DW ?
+    _g_virSize      DW ?
+    _g_virSpeed     DW ?
 
-    g_projShow      DB 0
-    g_altSprite     DB 0
-    g_spriteCounter DW 0
-    g_fireFrames    DW 60
+    g_projShow      DB ?
+    g_altSprite     DB ?
+    g_spriteCounter DW ?
+    g_fireFrames    DW ?
     g_cursY         DW _PLAYy_
-    g_moveFrames    DW 60
-    g_lastDepl      DW 0
+    g_moveFrames    DW ?
+    g_lastDepl      DW ?
 DSEG        ENDS
+
+g_INIT PROC NEAR
+    mov playerX, 32
+    mov playerY, 32
+    mov playerRight, 1
+
+    mov projX, 0
+    mov projY, 0
+    mov projRight, 1
+
+    mov mobsX, 65
+    mov mobsX+2, 85
+    mov mobsX+4, 105
+    mov mobsX+6, 125
+
+    mov mobsY, 65
+    mov mobsY+2, 85
+    mov mobsY+4, 105
+    mov mobsY+6, 125
+    mov mobsShowing, 1
+    mov mobsShowing+2, 1
+    mov mobsShowing+4, 1
+    mov mobsShowing+6, 1
+
+    mov g_projShow, 0
+    mov g_altSprite, 0
+    mov g_spriteCounter, 0
+    mov g_fireFrames, 60
+    mov g_cursY, _PLAYy_
+    mov g_moveFrames, 60
+    mov g_lastDepl, 0
+    ret
+g_INIT ENDP
 
 CLEARPROJ PROC NEAR
     push AX
@@ -258,7 +291,6 @@ ANIMATEBULLETR PROC NEAR
     sar  BX, 1
     mov  AX, mobsY+2
     sub  AX, BX
-    ;sub  AX, _g_virSize
     cmp  projY, AX
     jl   isOnMobThrR
     add  AX, _g_virSize
@@ -277,7 +309,6 @@ ANIMATEBULLETR PROC NEAR
     sar  BX, 1
     mov  AX, mobsY+4
     sub  AX, BX
-    ;sub  AX, _g_virSize
     cmp  projY, AX
     jl   isOnMobFouR
     add  AX, _g_virSize
@@ -296,7 +327,6 @@ ANIMATEBULLETR PROC NEAR
     sar  BX, 1
     mov  AX, mobsY+6
     sub  AX, BX
-    ;sub  AX, _g_virSize
     cmp  projY, AX
     jl   endBAnimR
     add  AX, _g_virSize
@@ -320,7 +350,7 @@ ANIMATEBULLETL PROC NEAR
     mov  AX, 0h
     ;add  AX, _g_projSize
     cmp  projX, AX
-    jg   endBAnimL
+    jg   isOnMobOneL
 
     mov  g_projShow, 0
 
@@ -343,6 +373,83 @@ ANIMATEBULLETL PROC NEAR
      pop CX
      pop BX
      pop AX
+
+    isOnMobOneL:
+    cmp  mobsShowing, 0
+    jz   isOnMobTwoL
+    mov  AX, mobsX
+    add  AX, _g_virSize
+    cmp  projX, AX
+    jg   isOnMobTwoL
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY
+    sub  AX, BX
+    cmp  projY, AX
+    jl   isOnMobTwoL
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jg   isOnMobTwoL
+    mov  mobsShowing, 0
+    mov  g_projShow, 0
+
+    isOnMobTwoL:
+    cmp  mobsShowing+2, 0
+    jz   isOnMobThrL
+    mov  AX, mobsX+2
+    add  AX, _g_virSize
+    cmp  projX, AX
+    jg   isOnMobThrL
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+2
+    sub  AX, BX
+    cmp  projY, AX
+    jl   isOnMobThrL
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jg   isOnMobThrL
+    mov  mobsShowing+2, 0
+    mov  g_projShow, 0
+
+    isOnMobThrL:
+    cmp  mobsShowing+4, 0
+    jz   isOnMobFouL
+    mov  AX, mobsX+4
+    add  AX, _g_virSize
+    cmp  projX, AX
+    jg   isOnMobFouL
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+4
+    sub  AX, BX
+    cmp  projY, AX
+    jl   isOnMobFouL
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jg   isOnMobFouL
+    mov  mobsShowing+4, 0
+    mov  g_projShow, 0
+
+    isOnMobFouL:
+    cmp  mobsShowing+6, 0
+    jz   endBAnimL
+    mov  AX, mobsX+6
+    add  AX, _g_virSize
+    cmp  projX, AX
+    jg   endBAnimL
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+6
+    sub  AX, BX
+    cmp  projY, AX
+    jl   endBAnimL
+    add  AX, _g_virSize
+    cmp  projY, AX
+    jg   endBAnimL
+    mov  mobsShowing+6, 0
+    mov  g_projShow, 0
+
 
     endBAnimL:
          pop  AX
