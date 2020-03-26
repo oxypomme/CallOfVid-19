@@ -1,6 +1,5 @@
 %include oxylib/oxysound.asm
 %include oxylib/oxygame.asm
-%include oxylib/oxyrand.asm
 
 DSEG        SEGMENT
     playerX         DW ?
@@ -11,6 +10,7 @@ DSEG        SEGMENT
     projY           DW ?
     projRight       DB ?
 
+    mobsHp          DW ?, ?, ?, ?
     mobsX           DW ?, ?, ?, ?
     mobsY           DW ?, ?, ?, ?
     mobsShowing     DW ?, ?, ?, ?
@@ -49,20 +49,27 @@ g_INIT PROC NEAR
     mov projY, 0
     mov projRight, 1
 
-    mov mobsX, 65
-    mov mobsX+2, 85
-    mov mobsX+4, 105
-    mov mobsX+6, 125
+    mov  mobsX, 16
+    mov  mobsY, 16
 
-    mov mobsY, 65
-    mov mobsY+2, 85
-    mov mobsY+4, 105
-    mov mobsY+6, 125
+    mov  mobsX+2, 287
+    mov  mobsY+2, 16
+
+    mov  mobsX+4, 16
+    mov  mobsY+4, 168
+
+    mov  mobsX+6, 287
+    mov  mobsY+6, 168
 
     mov mobsShowing, 1
     mov mobsShowing+2, 1
     mov mobsShowing+4, 1
     mov mobsShowing+6, 1
+
+    mov mobsHp, 3
+    mov mobsHp+2, 3
+    mov mobsHp+4, 3
+    mov mobsHp+6, 3
 
     mov g_projShow, 0
     mov g_altSprite, 0
@@ -178,6 +185,96 @@ g_DRAWBULLET PROC NEAR
          ret
 g_DRAWBULLET ENDP
 
+PLAYERCOLLIDEMOB PROC NEAR
+     push AX
+     push BX
+
+    cmp  mobsShowing, 0
+    jz   isOnMobTwo
+    mov  AX, mobsX
+    cmp  playerX, AX
+    jl   playerIsOnMobTwo
+    add  AX, _g_virSize
+    cmp  playerX, AX
+    jg   playerIsOnMobTwo
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY
+    sub  AX, BX
+    cmp  playerY, AX
+    jl   playerIsOnMobTwo
+    add  AX, _g_virSize
+    cmp  playerY, AX
+    jg   playerIsOnMobTwo
+     ;collision mob 1
+
+    playerIsOnMobTwo:
+    cmp  mobsShowing+2, 0
+    jz   playerIsOnMobThr
+    mov  AX, mobsX+2
+    cmp  playerX, AX
+    jl   playerIsOnMobThr
+    add  AX, _g_virSize
+    cmp  playerX, AX
+    jg   playerIsOnMobThr
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+2
+    sub  AX, BX
+    cmp  playerY, AX
+    jl   playerIsOnMobThr
+    add  AX, _g_virSize
+    cmp  playerY, AX
+    jg   playerIsOnMobThr
+    ;collision mob 2
+
+    playerIsOnMobThr:
+    cmp  mobsShowing+4, 0
+    jz   playerIsOnMobFou
+    mov  AX, mobsX+4
+    cmp  playerX, AX
+    jl   playerIsOnMobFou
+    add  AX, _g_virSize
+    cmp  playerX, AX
+    jg   playerIsOnMobFou
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+4
+    sub  AX, BX
+    cmp  playerY, AX
+    jl   playerIsOnMobFou
+    add  AX, _g_virSize
+    cmp  playerY, AX
+    jg   playerIsOnMobFou
+    ;collision mob 3
+
+    playerIsOnMobFou:
+    cmp  mobsShowing+6, 0
+    jz   endPlayerCollide
+    mov  AX, mobsX+6
+    cmp  playerX, AX
+    jl   endPlayerCollide
+    add  AX, _g_virSize
+    cmp  playerX, AX
+    jg   endPlayerCollide
+    mov  BX, _g_virSize
+    sar  BX, 1
+    mov  AX, mobsY+6
+    sub  AX, BX
+    cmp  playerY, AX
+    jl   endPlayerCollide
+    add  AX, _g_virSize
+    cmp  playerY, AX
+    jg   endPlayerCollide
+    ;collision mob 4
+
+    endPlayerCollide:
+
+     pop BX
+     pop AX
+     ret
+PLAYERCOLLIDEMOB ENDP
+
 BULLETCOLLIDEMOBS PROC NEAR
     push AX
     push BX
@@ -199,8 +296,11 @@ BULLETCOLLIDEMOBS PROC NEAR
     add  AX, _g_virSize
     cmp  projY, AX
     jg   isOnMobTwo
-    mov  mobsShowing, 0
     mov  g_projShow, 0
+    dec mobsHp
+    cmp mobsHp, 0
+    jne isOnMobTwo
+    mov  mobsShowing, 0
     CLEARVIRUS mobsX, mobsY
 
 
@@ -222,8 +322,11 @@ BULLETCOLLIDEMOBS PROC NEAR
     add  AX, _g_virSize
     cmp  projY, AX
     jg   isOnMobThr
-    mov  mobsShowing+2, 0
     mov  g_projShow, 0
+    dec  mobsHp+2
+    cmp mobsHp+2, 0
+    jne isOnMobThr
+    mov  mobsShowing+2, 0
     CLEARVIRUS mobsX+2, mobsY+2
 
     isOnMobThr:
@@ -244,8 +347,11 @@ BULLETCOLLIDEMOBS PROC NEAR
     add  AX, _g_virSize
     cmp  projY, AX
     jg   isOnMobFou
-    mov  mobsShowing+4, 0
     mov  g_projShow, 0
+    dec mobsHp+4
+    cmp  mobsHp+4, 0
+    jne isOnMobFou
+    mov  mobsShowing+4, 0
     CLEARVIRUS mobsX+4, mobsY+4
 
     isOnMobFou:
@@ -266,8 +372,11 @@ BULLETCOLLIDEMOBS PROC NEAR
     add  AX, _g_virSize
     cmp  projY, AX
     jg   endCollide
-    mov  mobsShowing+6, 0
     mov  g_projShow, 0
+    dec  mobsHp+6
+    cmp  mobsHp+6, 0
+    jne  endCollide
+    mov  mobsShowing+6, 0
     CLEARVIRUS mobsX+6, mobsY+6
 
     endCollide:

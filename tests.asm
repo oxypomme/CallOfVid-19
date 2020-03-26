@@ -1,5 +1,6 @@
 .286
 
+
 SSEG     SEGMENT STACK
          DB      32      DUP("STACK---")
 SSEG     ENDS
@@ -85,7 +86,7 @@ MAIN     PROC FAR
          mov  oxj_framerate, 25
          call oxj_FRM
          call g_ANIMATEPLAYER
-
+         call PLAYERCOLLIDEMOB
          ; oxgCLEAR
 
          cmp  g_projShow, 0
