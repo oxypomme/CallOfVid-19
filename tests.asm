@@ -15,7 +15,6 @@ CSEG     SEGMENT 'CODE'
 ASSUME   CS:CSEG, DS:DSEG, SS:SSEG
 
 %include game.asm
-;%include oxylib/oxyrand.asm
 
 MAIN     PROC FAR
     ; Sauver l'adresse de retour
@@ -62,22 +61,21 @@ MAIN     PROC FAR
          jmp  menu
 
          menu_down:
-              cmp  g_cursY, 100
-              jg   menu
+              cmp  g_cursY, _PLAYy_
+              jne  menu
               mov  g_cursY, _QUITy_
               oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_up:
-              cmp  g_cursY, 100
-              jl   menu
+              cmp  g_cursY, _QUITy_
+              jne  menu
               mov  g_cursY, _PLAYy_
               oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_next:
               oxsPLAYSOUND _B_, 1
-              cmp  g_cursY, 100
-              push AX
-              jl   init_draw
+              cmp  g_cursY, _PLAYy_
+              je   init_draw
               jmp  endprog
     init_draw:
          oxgCLEAR
