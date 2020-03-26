@@ -1,5 +1,7 @@
 %include oxylib/oxysound.asm
 %include oxylib/oxygame.asm
+%include assets/drawV3.asm
+%include assets/drawV3a.asm
 
 DSEG        SEGMENT
     playerX         DW ?
@@ -10,7 +12,10 @@ DSEG        SEGMENT
     projY           DW ?
     projRight       DB ?
 
-    mobsHp          DW ?, ?, ?, ?
+    mobHp1          DW 3
+    mobHp2          DW 3
+    mobHp3          DW 3
+    mobHp4          DW 3
     mobsX           DW ?, ?, ?, ?
     mobsY           DW ?, ?, ?, ?
     mobsShowing     DW ?, ?, ?, ?
@@ -38,6 +43,7 @@ DSEG        SEGMENT
     g_cursY         DW _PLAYy_
     g_moveFrames    DW 60
     g_lastDepl      DW 0
+    g_virusAnimFrames  DW 0
 DSEG        ENDS
 
 g_INIT PROC NEAR
@@ -66,10 +72,10 @@ g_INIT PROC NEAR
     mov mobsShowing+4, 1
     mov mobsShowing+6, 1
 
-    mov mobsHp, 3
-    mov mobsHp+2, 3
-    mov mobsHp+4, 3
-    mov mobsHp+6, 3
+    mov mobHp1, 3
+    mov mobHp2, 3
+    mov mobHp3, 3
+    mov mobHp4, 3
 
     mov g_projShow, 0
     mov g_altSprite, 0
@@ -77,6 +83,7 @@ g_INIT PROC NEAR
     mov g_fireFrames, 60
     mov g_moveFrames, 60
     mov g_lastDepl, 0
+    mov g_virusAnimFrames, 0
     ret
 g_INIT ENDP
 
@@ -94,7 +101,7 @@ CLEARPLAYER PROC NEAR
     ret
 CLEARPLAYER ENDP
 
-g_DRAWPLAYER PROC NEAR
+g_DRAWPLAYER PROC FAR
     cmp  playerRight, 0
     jnz  gPdrawR
 
@@ -185,7 +192,7 @@ g_DRAWBULLET PROC NEAR
          ret
 g_DRAWBULLET ENDP
 
-PLAYERCOLLIDEMOB PROC NEAR
+PLAYERCOLLIDEMOB PROC FAR
      push AX
      push BX
 
@@ -275,7 +282,7 @@ PLAYERCOLLIDEMOB PROC NEAR
      ret
 PLAYERCOLLIDEMOB ENDP
 
-BULLETCOLLIDEMOBS PROC NEAR
+BULLETCOLLIDEMOBS PROC FAR
     push AX
     push BX
 
@@ -297,8 +304,8 @@ BULLETCOLLIDEMOBS PROC NEAR
     cmp  projY, AX
     jg   isOnMobTwo
     mov  g_projShow, 0
-    dec mobsHp
-    cmp mobsHp, 0
+    dec mobHP1
+    cmp mobHP1, 0
     jne isOnMobTwo
     mov  mobsShowing, 0
     CLEARVIRUS mobsX, mobsY
@@ -323,8 +330,8 @@ BULLETCOLLIDEMOBS PROC NEAR
     cmp  projY, AX
     jg   isOnMobThr
     mov  g_projShow, 0
-    dec  mobsHp+2
-    cmp mobsHp+2, 0
+    dec  mobHP2
+    cmp mobHP2, 0
     jne isOnMobThr
     mov  mobsShowing+2, 0
     CLEARVIRUS mobsX+2, mobsY+2
@@ -348,8 +355,8 @@ BULLETCOLLIDEMOBS PROC NEAR
     cmp  projY, AX
     jg   isOnMobFou
     mov  g_projShow, 0
-    dec mobsHp+4
-    cmp  mobsHp+4, 0
+    dec mobHP3
+    cmp  mobHP3, 0
     jne isOnMobFou
     mov  mobsShowing+4, 0
     CLEARVIRUS mobsX+4, mobsY+4
@@ -373,8 +380,8 @@ BULLETCOLLIDEMOBS PROC NEAR
     cmp  projY, AX
     jg   endCollide
     mov  g_projShow, 0
-    dec  mobsHp+6
-    cmp  mobsHp+6, 0
+    dec  mobHP4
+    cmp  mobHP4, 0
     jne  endCollide
     mov  mobsShowing+6, 0
     CLEARVIRUS mobsX+6, mobsY+6
@@ -450,7 +457,15 @@ g_ANIMATEPLAYER PROC NEAR
          ret
 g_ANIMATEPLAYER ENDP
 
-%include assets/drawVir.asm
+
+g_ANIMATEVIRUSES PROC NEAR
+     inc g_virusAnimFrames
+     cmp g_virusAnimFrames, 60
+     jne gAnimVirusFramesEnd
+     mov g_virusAnimFrames, 0
+     gAnimVirusFramesEnd:
+          ret
+g_ANIMATEVIRUSES ENDP
 
 g_PFORWARD PROC NEAR
     push AX
@@ -633,7 +648,7 @@ g_MENU PROC NEAR
 
     mov  DX, g_cursY
     sub  DX, _g_virSize
-    g_DRAWVIRUS 122, DX
+    DRAWVIRUSo 122, DX
 
     pop  DX
     pop  CX
@@ -642,23 +657,52 @@ g_MENU PROC NEAR
     ret
 g_MENU ENDP
 
-g_DRAWMOBS PROC NEAR
+
+
+g_DRAWMOBS PROC FAR
+     cmp g_virusAnimFrames, 30
+     ja drawAltVir
     cmp  mobsShowing, 0
     jz   drawSecVirus
-    g_DRAWVIRUS mobsX, mobsY
+     
+     CLEARVIRUS mobsX, mobsY
+     DRAWVIRUSo mobsX, mobsY
     drawSecVirus:
          cmp  mobsShowing+2, 0
          jz   drawThiVirus
-         g_DRAWVIRUS mobsX+2, mobsY+2
+         CLEARVIRUS mobsX+2, mobsY+2
+         DRAWVIRUSo mobsX+2, mobsY+2
     drawThiVirus:
          cmp  mobsShowing+4, 0
          jz   drawFouVirus
-         g_DRAWVIRUS mobsX+4, mobsY+4
+         CLEARVIRUS mobsX+4, mobsY+4
+         DRAWVIRUSo mobsX+4, mobsY+4
     drawFouVirus:
          cmp  mobsShowing+6, 0
          jz   nextDraw
-         g_DRAWVIRUS mobsX+6, mobsY+6
-
+         CLEARVIRUS mobsX+6, mobsY+6
+         DRAWVIRUSo mobsX+6, mobsY+6
+     jmp nextDraw
+     drawAltVir:
+          cmp  mobsShowing, 0
+          jz   drawAltSecVirus
+          CLEARVIRUS mobsX, mobsY
+          DRAWVIRao mobsX, mobsY
+          drawAltSecVirus:
+               cmp  mobsShowing+2, 0
+               jz   drawAltThiVirus
+               CLEARVIRUS mobsX+2, mobsY+2
+               DRAWVIRao mobsX+2, mobsY+2
+          drawAltThiVirus:
+               cmp  mobsShowing+4, 0
+               jz   drawAltFouVirus
+               CLEARVIRUS mobsX+4, mobsY+4
+               DRAWVIRao mobsX+4, mobsY+4
+          drawAltFouVirus:
+               cmp  mobsShowing+6, 0
+               jz   nextDraw
+               CLEARVIRUS mobsX+6, mobsY+6
+               DRAWVIRao mobsX+6, mobsY+6
     nextDraw:
     ret
 g_DRAWMOBS ENDP

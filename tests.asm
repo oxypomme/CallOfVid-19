@@ -1,6 +1,5 @@
 .286
 
-
 SSEG     SEGMENT STACK
          DB      32      DUP("STACK---")
 SSEG     ENDS
@@ -84,8 +83,10 @@ MAIN     PROC FAR
     draw:
          pop  AX
          mov  oxj_framerate, 25
+          call g_DRAWPLAYER
          call oxj_FRM
          call g_ANIMATEPLAYER
+         call g_ANIMATEVIRUSES
          call PLAYERCOLLIDEMOB
          ; oxgCLEAR
 
@@ -100,7 +101,6 @@ MAIN     PROC FAR
               mov  AH, 01h ; on veut vérifier si une touche est appuyée
               int  16h     ; on vérifie si une touche est appuyée
               jz   draw
-         
          ; on récupère la touche appuyée dans AH
          call oxj_GETKEY
 
