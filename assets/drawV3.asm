@@ -1,16 +1,12 @@
 DRAWVIRUSo MACRO xA, yA
+	; généré avec https://github.com/oxypomme/BMPtoASM
 	push AX
 	push BX
 
 	mov  AX, xA
 	mov  BX, yA
 
-
-	inc  AX
-	mov  BX, yA
-
-
-	inc  AX
+	add  AX, 2
 	mov  BX, yA
 
 	add  BX, 3
@@ -299,10 +295,6 @@ DRAWVIRUSo MACRO xA, yA
 	oxgSHOWPIXEL AX, BX, 0B8h	; 14-7
 	add  BX, 3
 	oxgSHOWPIXEL AX, BX, 0B8h	; 14-10
-
-	inc  AX
-	mov  BX, yA
-
 
 	pop  BX
 	pop  AX

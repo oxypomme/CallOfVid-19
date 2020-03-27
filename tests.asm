@@ -31,14 +31,17 @@ MAIN     PROC FAR
     push AX
     menu:
          pop  AX
-         mov  oxj_framerate, 25
+         mov  oxj_framerate, 60
          call oxj_FRM
 
          oxgFILLS 0, 0, 39, 24, _WHITE_
 
          call g_MENU
+         call g_ANIMATEVIRUSES
 
          push AX
+         call oxj_GETKEYPRESS
+         jz   menu
          ; on récupère la touche appuyée dans AH
          call oxj_GETKEY
 
@@ -98,8 +101,7 @@ MAIN     PROC FAR
               call g_DRAWMOBS
               ; call g_DRAWPLAYER
               push AX
-              mov  AH, 01h ; on veut vérifier si une touche est appuyée
-              int  16h     ; on vérifie si une touche est appuyée
+              call oxj_GETKEYPRESS
               jz   draw
          ; on récupère la touche appuyée dans AH
          call oxj_GETKEY

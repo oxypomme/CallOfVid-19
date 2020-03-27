@@ -1,9 +1,9 @@
+; généré avec https://github.com/oxypomme/BMPtoASM
 push AX
 push BX
 
 mov  AX, playerX
 mov  BX, playerY
-
 
 add  AX, 2
 mov  BX, playerY
@@ -194,7 +194,6 @@ inc  BX
 oxgSHOWPIXEL AX, BX, 00Ch	; 13-8
 inc  BX
 oxgSHOWPIXEL AX, BX, 05Ah	; 13-9
-
 
 pop  BX
 pop  AX

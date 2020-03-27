@@ -1,9 +1,9 @@
+; généré avec https://github.com/oxypomme/BMPtoASM
 push AX
 push BX
 
 mov  AX, playerX
 mov  BX, playerY
-
 
 add  AX, 2
 mov  BX, playerY

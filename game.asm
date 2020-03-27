@@ -1,106 +1,153 @@
 %include oxylib/oxysound.asm
 %include oxylib/oxygame.asm
+%include oxylib/oxyrand.asm
+
 %include assets/drawV3.asm
 %include assets/drawV3a.asm
 
 DSEG        SEGMENT
+     ; position du joueur
     playerX         DW ?
     playerY         DW ?
+    ; 1 si le joueur pointe à droite
     playerRight     DB ?
 
+     ; coordonnées du projectile
     projX           DW ?
     projY           DW ?
+    ; 1 si le projectile pointe à droite
     projRight       DB ?
 
-    mobsX           DW ?, ?, ?, ?
-    mobsY           DW ?, ?, ?, ?
-    mobsShowing     DW ?, ?, ?, ?
+     ; position des ennemis
+    mobsX           DW 0, 0, 0, 0
+    mobsY           DW 0, 0, 0, 0
+    ; 1 si les ennemis sont visibles
+    mobsShowing     DW 0, 0, 0, 0
 
-    titleLbl        DB "Call Of Vid-19"
+     ; titre
+    titleLbl        DB "Call Of VID-19"
     l_titleLbl      EQU $-titleLbl
+    ; jouer
     playBtn         DB "Play"
     l_playBtn       EQU $-playBtn
+    ; ordonnée du bouton jouer
     _PLAYy_         EQU 92
+    ; quitter
     quitBtn         DB "Quit"
     l_quitBtn       EQU $-quitBtn
+    ; ordonnée du bouton quitter
     _QUITy_         EQU 115
-
+     
+     ; taille du joueur
     _g_playerSize   DW 16
+    ; pixels par touche appuyés du deplacement du joueur
     _g_playerSpeed  DW 8
+    ; taille du projectile
     _g_projSize     DW 16
+    ; pixels par mise à jour du jeu du deplacement du projectile
     _g_projSpeed    DW 2
+    ; taille du virus en pixel
     _g_virSize      DW 16
+    ; pixels par mise à jour du jeu du deplacement des virus
     _g_virSpeed     DW 1
 
+     ; 1 si un projectile est affiché à l'écran
     g_projShow      DB 0
+    ; 1 si le joueur doit être affiché dans son sprite alternatif (animation)
     g_altSprite     DB 0
+    ; compteur de frames pendant qu'un sprite joueur est affiché (animation)
     g_spriteCounter DW 0
+    ; compteur de frames pendant qu'un sprite joueur de recul est affiché (animation)
     g_fireFrames    DW 60
+    ; ordonnée du curseur dans le menu
     g_cursY         DW _PLAYy_
+    ; compteur de frames après un déplacement du joueur (animation)
     g_moveFrames    DW 60
+    ; dernier type de mouvement fait par le joueur (haut, bas, gauche, droite)
     g_lastDepl      DW 0
+    ; compteur de frames pendant qu'un sprite ennemi est affiché (animation)
     g_virusAnimFrames  DW 0
 DSEG        ENDS
 
+SPAWNVIRUS MACRO virX, virY, show
+    push DX
+
+    oxrGETRND 100h, DX
+    add  DX, 20h
+    mov  virX, DX
+    oxrGETRND 88h, DX
+    add  DX, 20h
+    mov  virY, DX
+    mov  show, 1
+
+    pop  DX
+ENDM
+
+; g_INIT
+;
+; initialise une nouvelle partie
 g_INIT PROC NEAR
-    mov playerX, 32
-    mov playerY, 32
+    mov playerX, 16
+    mov playerY, 16
     mov playerRight, 1
 
     mov projX, 0
     mov projY, 0
     mov projRight, 1
 
-    mov  mobsX, 16
-    mov  mobsY, 16
+    SPAWNVIRUS mobsX, mobsY, mobsShowing
+    SPAWNVIRUS mobsX+2, mobsY+2, mobsShowing+2
+    SPAWNVIRUS mobsX+4, mobsY+4, mobsShowing+4
+    SPAWNVIRUS mobsX+6, mobsY+6, mobsShowing+6
 
-    mov  mobsX+2, 287
-    mov  mobsY+2, 16
+    mov  g_projShow, 0
+    mov  g_altSprite, 0
+    mov  g_spriteCounter, 0
+    mov  g_fireFrames, 60
+    mov  g_moveFrames, 60
+    mov  g_lastDepl, 0
+    mov  g_virusAnimFrames, 0
 
-    mov  mobsX+4, 16
-    mov  mobsY+4, 168
-
-    mov  mobsX+6, 287
-    mov  mobsY+6, 168
-
-    mov mobsShowing, 1
-    mov mobsShowing+2, 1
-    mov mobsShowing+4, 1
-    mov mobsShowing+6, 1
-
-    mov g_projShow, 0
-    mov g_altSprite, 0
-    mov g_spriteCounter, 0
-    mov g_fireFrames, 60
-    mov g_moveFrames, 60
-    mov g_lastDepl, 0
-    mov g_virusAnimFrames, 0
     ret
 g_INIT ENDP
 
+; CLEARVIRUS
+;
+; efface une zone de la taille d'un virus
+; X : absisse du point haut gauche de la zone
+; Y : ordonnée du point haut gauche de la zone
 CLEARVIRUS MACRO X, Y
-     oxg_CLEARSOMETHING X, Y, 2, 2
+    oxg_CLEARSOMETHING X, Y, 2, 2
 ENDM
 
+; CLEARPROJ
+;
+; efface le projectile
 CLEARPROJ PROC NEAR
-     oxg_CLEARSOMETHING projX, projY, 2, 1
+    oxg_CLEARSOMETHING projX, projY, 2, 1
     ret
 CLEARPROJ ENDP
 
+; CLEARPLAYER
+;
+; efface le joueur
 CLEARPLAYER PROC NEAR
-     oxg_CLEARSOMETHING playerX, playerY, 1, 1
+    oxg_CLEARSOMETHING playerX, playerY, 1, 1
     ret
 CLEARPLAYER ENDP
 
+; g_DRAWPLAYER
+;
+; dessine le joueur
 g_DRAWPLAYER PROC FAR
     cmp  playerRight, 0
     jnz  gPdrawR
-
-    cmp  g_fireFrames, 30
+     ; la magie fait que ça fonctionne
+    cmp  g_fireFrames, 30 ; priorité à l'animation de tir
     jbe  gPdrawFireL
-    cmp  g_moveFrames, 30
+    cmp  g_moveFrames, 30 ; animation de déplacement
     jbe  gPdrawMoveL
-    cmp  g_altSprite, 0
+    cmp  g_altSprite, 0 ;animation idle
     jnz  gPdrawAltL
     %include assets/drawPl.asm
     jmp  gPdrawEnd
@@ -156,6 +203,9 @@ g_DRAWPLAYER PROC FAR
          ret
 g_DRAWPLAYER ENDP
 
+; g_DRAWBULLET
+;
+; dessine le projectile
 g_DRAWBULLET PROC NEAR
      call CLEARPROJ
 
@@ -183,6 +233,9 @@ g_DRAWBULLET PROC NEAR
          ret
 g_DRAWBULLET ENDP
 
+; PLAYERCOLLIDEMOB
+;
+; réalise les tests de collision entre le joueur et les mobs
 PLAYERCOLLIDEMOB PROC FAR
      push AX
      push BX
@@ -273,6 +326,9 @@ PLAYERCOLLIDEMOB PROC FAR
      ret
 PLAYERCOLLIDEMOB ENDP
 
+; BULLETCOLLIDEMOBS
+;
+; réalise les tests de collision entre le projectile et les mobs
 BULLETCOLLIDEMOBS PROC FAR
     push AX
     push BX
@@ -372,6 +428,9 @@ BULLETCOLLIDEMOBS PROC FAR
     ret
 BULLETCOLLIDEMOBS ENDP
 
+; ANIMATEBULLETR
+;
+; réalise les animation du projectile quand il va vers la droite
 ANIMATEBULLETR PROC NEAR
     push AX
 
@@ -393,6 +452,9 @@ ANIMATEBULLETR PROC NEAR
     ret
 ANIMATEBULLETR ENDP
 
+; ANIMATEBULLETL
+;
+; réalise les animation du projectile quand il va vers la gauche
 ANIMATEBULLETL PROC NEAR
     push AX
 
@@ -415,6 +477,9 @@ ANIMATEBULLETL PROC NEAR
     ret
 ANIMATEBULLETL ENDP
 
+; g_ANIMATEPLAYER
+;
+; mets à jour les variables d'animation du joueur
 g_ANIMATEPLAYER PROC NEAR
     inc  g_spriteCounter
     cmp  g_fireFrames, 60
@@ -436,7 +501,9 @@ g_ANIMATEPLAYER PROC NEAR
          ret
 g_ANIMATEPLAYER ENDP
 
-
+; g_ANIMATEVIRUSES
+;
+; anime les virus
 g_ANIMATEVIRUSES PROC NEAR
      inc g_virusAnimFrames
      cmp g_virusAnimFrames, 60
@@ -446,6 +513,9 @@ g_ANIMATEVIRUSES PROC NEAR
           ret
 g_ANIMATEVIRUSES ENDP
 
+; g_PFORWARD
+;
+; code exécuté quand la touche du haut est pressée
 g_PFORWARD PROC NEAR
     push AX
     push BX
@@ -472,6 +542,9 @@ g_PFORWARD PROC NEAR
          ret
 g_PFORWARD ENDP
 
+; g_PLEFTWARD
+;
+; code exécuté quand la touche de gauche est pressée
 g_PLEFTWARD PROC NEAR
     push AX
     push BX
@@ -499,6 +572,9 @@ g_PLEFTWARD PROC NEAR
          ret
 g_PLEFTWARD ENDP
 
+; g_PBACKWARD
+;
+; code exécuté quand la touche du bas est pressée
 g_PBACKWARD PROC NEAR
     push AX
     push BX
@@ -525,6 +601,9 @@ g_PBACKWARD PROC NEAR
          ret
 g_PBACKWARD ENDP
 
+; g_PRIGHTWARD
+;
+; code exécuté quand la touche de droite est pressée
 g_PRIGHTWARD PROC NEAR
     push AX
     push BX
@@ -553,6 +632,9 @@ g_PRIGHTWARD PROC NEAR
          ret
 g_PRIGHTWARD ENDP
 
+; g_SHOOT
+;
+; code exécuté lorsque le joueur tire
 g_SHOOT PROC NEAR
     cmp  g_fireFrames, 50
     jl  endShoot
@@ -591,6 +673,9 @@ g_SHOOT PROC NEAR
     ret
 g_SHOOT ENDP
 
+; g_MENU
+;
+; gestion du menu
 g_MENU PROC NEAR
     push AX
     push BX
@@ -627,8 +712,15 @@ g_MENU PROC NEAR
 
     mov  DX, g_cursY
     sub  DX, _g_virSize
+    CLEARVIRUS 122, DX
+    cmp g_virusAnimFrames, 30
+    ja drawAltMenuVirus
     DRAWVIRUSo 122, DX
+    jmp finallyMenu
+    drawAltMenuVirus:
+    DRAWVIRao 122, DX
 
+    finallyMenu:
     pop  DX
     pop  CX
     pop  BX
@@ -636,8 +728,9 @@ g_MENU PROC NEAR
     ret
 g_MENU ENDP
 
-
-
+; g_DRAWMOBS
+;
+; dessine les virus
 g_DRAWMOBS PROC FAR
      cmp g_virusAnimFrames, 30
      ja drawAltVir
