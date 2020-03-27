@@ -12,10 +12,6 @@ DSEG        SEGMENT
     projY           DW ?
     projRight       DB ?
 
-    mobHp1          DW 3
-    mobHp2          DW 3
-    mobHp3          DW 3
-    mobHp4          DW 3
     mobsX           DW ?, ?, ?, ?
     mobsY           DW ?, ?, ?, ?
     mobsShowing     DW ?, ?, ?, ?
@@ -71,11 +67,6 @@ g_INIT PROC NEAR
     mov mobsShowing+2, 1
     mov mobsShowing+4, 1
     mov mobsShowing+6, 1
-
-    mov mobHp1, 3
-    mov mobHp2, 3
-    mov mobHp3, 3
-    mov mobHp4, 3
 
     mov g_projShow, 0
     mov g_altSprite, 0
@@ -304,9 +295,6 @@ BULLETCOLLIDEMOBS PROC FAR
     cmp  projY, AX
     jg   isOnMobTwo
     mov  g_projShow, 0
-    dec mobHP1
-    cmp mobHP1, 0
-    jne isOnMobTwo
     mov  mobsShowing, 0
     CLEARVIRUS mobsX, mobsY
 
@@ -330,9 +318,6 @@ BULLETCOLLIDEMOBS PROC FAR
     cmp  projY, AX
     jg   isOnMobThr
     mov  g_projShow, 0
-    dec  mobHP2
-    cmp mobHP2, 0
-    jne isOnMobThr
     mov  mobsShowing+2, 0
     CLEARVIRUS mobsX+2, mobsY+2
 
@@ -355,9 +340,6 @@ BULLETCOLLIDEMOBS PROC FAR
     cmp  projY, AX
     jg   isOnMobFou
     mov  g_projShow, 0
-    dec mobHP3
-    cmp  mobHP3, 0
-    jne isOnMobFou
     mov  mobsShowing+4, 0
     CLEARVIRUS mobsX+4, mobsY+4
 
@@ -380,9 +362,6 @@ BULLETCOLLIDEMOBS PROC FAR
     cmp  projY, AX
     jg   endCollide
     mov  g_projShow, 0
-    dec  mobHP4
-    cmp  mobHP4, 0
-    jne  endCollide
     mov  mobsShowing+6, 0
     CLEARVIRUS mobsX+6, mobsY+6
 
@@ -578,7 +557,7 @@ g_SHOOT PROC NEAR
     cmp  g_fireFrames, 50
     jl  endShoot
 
-    oxsPLAYSOUND _A_, 1
+    ;oxsPLAYSOUND _A_, 1
      call CLEARPROJ
     push AX
     push BX

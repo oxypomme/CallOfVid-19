@@ -64,16 +64,16 @@ MAIN     PROC FAR
               cmp  g_cursY, _PLAYy_
               jne  menu
               mov  g_cursY, _QUITy_
-              oxsPLAYSOUND _F_, 1
+              ;oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_up:
               cmp  g_cursY, _QUITy_
               jne  menu
               mov  g_cursY, _PLAYy_
-              oxsPLAYSOUND _F_, 1
+              ;oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_next:
-              oxsPLAYSOUND _B_, 1
+              ;oxsPLAYSOUND _B_, 1
               cmp  g_cursY, _PLAYy_
               je   init_draw
               jmp  endprog
