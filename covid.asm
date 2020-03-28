@@ -35,8 +35,41 @@ MAIN     PROC FAR
          call oxj_FRM
 
          oxgFILLS 0, 0, 39, 24, _WHITE_
+         
+         push AX
+         push BX
+         push CX
+         push DX
 
          call g_MENU
+
+         ; on va écrire l'état du jeu (gagnant ou perdant)
+         mov  BX, 0001h
+
+         cmp  g_playerWin, 2
+         je   skipWin
+         cmp  g_playerWin, 1
+         jne  menuLoose
+         
+         oxgFILLS 2, 2, 37, 2, _BLACK_
+         oxgSETCURSOR 3, 2
+         lea  DX, winLbl
+         mov  CX, l_winLbl
+         jmp  menuWrite
+         menuLoose:
+              oxgFILLS 4, 2, 36, 2, _BLACK_
+              oxgSETCURSOR 5, 2
+              lea  DX, looseLbl
+              mov  CX, l_looseLbl
+         menuWrite:
+              mov  AH, 40h
+              int  21h
+
+              pop  DX
+              pop  CX
+              pop  BX
+              pop  AX
+         skipWin:
          call g_ANIMATEVIRUSES
 
          push AX
@@ -67,16 +100,16 @@ MAIN     PROC FAR
               cmp  g_cursY, _PLAYy_
               jne  menu
               mov  g_cursY, _QUITy_
-              ;oxsPLAYSOUND _F_, 1
+              oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_up:
               cmp  g_cursY, _QUITy_
               jne  menu
               mov  g_cursY, _PLAYy_
-              ;oxsPLAYSOUND _F_, 1
+              oxsPLAYSOUND _F_, 1
               jmp  menu
          menu_next:
-              ;oxsPLAYSOUND _B_, 1
+              oxsPLAYSOUND _B_, 1
               cmp  g_cursY, _PLAYy_
               je   init_draw
               jmp  endprog
@@ -86,13 +119,20 @@ MAIN     PROC FAR
     draw:
          pop  AX
          mov  oxj_framerate, 25
-          call g_DRAWPLAYER
+         call g_DRAWPLAYER
          call oxj_FRM
          call g_ANIMATEPLAYER
          call g_ANIMATEVIRUSES
-         call PLAYERCOLLIDEMOB
+         call g_PLAYERCOLLIDEMOB
+         call g_CHECKWIN
          ; oxgCLEAR
 
+         cmp  g_playerWin, 2
+         je   skipEndGame
+         push AX
+         jmp  menu
+
+         skipEndGame:
          cmp  g_projShow, 0
          jz  ndrawProj
 

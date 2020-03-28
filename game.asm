@@ -11,6 +11,8 @@ DSEG        SEGMENT
     playerY         DW ?
     ; 1 si le joueur pointe à droite
     playerRight     DB ?
+    ; 1 si le joueur a gagné, 2 si c'est une nouvelle partie
+    g_playerWin     DW 2
 
      ; coordonnées du projectile
     projX           DW ?
@@ -37,6 +39,12 @@ DSEG        SEGMENT
     l_quitBtn       EQU $-quitBtn
     ; ordonnée du bouton quitter
     _QUITy_         EQU 115
+    ; message de victoire
+    winLbl          DB "The VID-19 is'nt a treat anymore !"
+    l_winLbl        EQU $-winLbl
+    ; message de défaite
+    looseLbl        DB "You failed to stem the VID-19 !"
+    l_looseLbl      EQU $-looseLbl
      
      ; taille du joueur
     _g_playerSize   DW 16
@@ -51,7 +59,7 @@ DSEG        SEGMENT
     ; pixels par mise à jour du jeu du deplacement des virus
     _g_virSpeed     DW 1
 
-     ; 1 si un projectile est affiché à l'écran
+    ; 1 si un projectile est affiché à l'écran
     g_projShow      DB 0
     ; 1 si le joueur doit être affiché dans son sprite alternatif (animation)
     g_altSprite     DB 0
@@ -236,7 +244,7 @@ g_DRAWBULLET ENDP
 ; PLAYERCOLLIDEMOB
 ;
 ; réalise les tests de collision entre le joueur et les mobs
-PLAYERCOLLIDEMOB PROC FAR
+g_PLAYERCOLLIDEMOB PROC FAR
      push AX
      push BX
 
@@ -257,6 +265,7 @@ PLAYERCOLLIDEMOB PROC FAR
     add  AX, _g_virSize
     cmp  playerY, AX
     jg   playerIsOnMobTwo
+    mov  g_playerWin, 0
      ;collision mob 1
 
     playerIsOnMobTwo:
@@ -277,6 +286,7 @@ PLAYERCOLLIDEMOB PROC FAR
     add  AX, _g_virSize
     cmp  playerY, AX
     jg   playerIsOnMobThr
+    mov  g_playerWin, 0
     ;collision mob 2
 
     playerIsOnMobThr:
@@ -297,6 +307,7 @@ PLAYERCOLLIDEMOB PROC FAR
     add  AX, _g_virSize
     cmp  playerY, AX
     jg   playerIsOnMobFou
+    mov  g_playerWin, 0
     ;collision mob 3
 
     playerIsOnMobFou:
@@ -317,6 +328,7 @@ PLAYERCOLLIDEMOB PROC FAR
     add  AX, _g_virSize
     cmp  playerY, AX
     jg   endPlayerCollide
+    mov  g_playerWin, 0
     ;collision mob 4
 
     endPlayerCollide:
@@ -324,7 +336,7 @@ PLAYERCOLLIDEMOB PROC FAR
      pop BX
      pop AX
      ret
-PLAYERCOLLIDEMOB ENDP
+g_PLAYERCOLLIDEMOB ENDP
 
 ; BULLETCOLLIDEMOBS
 ;
@@ -639,8 +651,8 @@ g_SHOOT PROC NEAR
     cmp  g_fireFrames, 50
     jl  endShoot
 
-    ;oxsPLAYSOUND _A_, 1
-     call CLEARPROJ
+    oxsPLAYSOUND _A_, 1
+    call CLEARPROJ
     push AX
     push BX
     
@@ -684,7 +696,6 @@ g_MENU PROC NEAR
 
     oxgFILLS 11, 5, 28, 15, _BLACK_
 
-    ; on écrit le titre
     oxgSETCURSOR 13, 7
     mov  BX, 0001h
     lea  DX, titleLbl
@@ -709,7 +720,6 @@ g_MENU PROC NEAR
     int  21h
     oxgSETCURSOR 0, 0
 
-
     mov  DX, g_cursY
     sub  DX, _g_virSize
     CLEARVIRUS 122, DX
@@ -727,6 +737,23 @@ g_MENU PROC NEAR
     pop  AX
     ret
 g_MENU ENDP
+
+; g_CHECKWIN
+;
+; vérifie si le joueur à gagné
+g_CHECKWIN PROC NEAR
+    cmp  mobsShowing, 0
+    jnz  finallyCheckWin
+    cmp  mobsShowing+2, 0
+    jnz  finallyCheckWin
+    cmp  mobsShowing+4, 0
+    jnz  finallyCheckWin
+    cmp  mobsShowing+6, 0
+    jnz  finallyCheckWin
+    mov  g_playerWin, 1
+    finallyCheckWin:
+    ret
+g_CHECKWIN ENDP
 
 ; g_DRAWMOBS
 ;
