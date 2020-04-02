@@ -27,47 +27,45 @@ MAIN     PROC FAR
     ;   320*200 avec 256 couleurs
     call oxgSETUPGRAPHICS
     push AX
+    init_menu:
+         call g_MENU
     menu:
          pop  AX
          mov  oxj_framerate, 60
          call oxj_FRM
-
-         oxgFILLS 0, 0, 39, 24, _WHITE_
          
          push AX
          push BX
          push CX
          push DX
 
-         call g_MENU
+         cmp  g_cursY, _PLAYy_
+         jne   clearQuitCursor
+         mov  DX, _QUITy_
+         jmp drawCursor
+         clearQuitCursor:
+         mov  DX, _PLAYy_
 
-         ; on va écrire l'état du jeu (gagnant ou perdant)
-         mov  BX, 0001h
+         drawCursor:
+         sub  DX, _g_virSize
+         CLEARVIRUS 122, DX
 
-         cmp  g_playerWin, 2
-         je   skipWin
-         cmp  g_playerWin, 1
-         jne  menuLoose
-         
-         oxgFILLS 2, 2, 37, 2, _BLACK_
-         oxgSETCURSOR 3, 2
-         lea  DX, winLbl
-         mov  CX, l_winLbl
-         jmp  menuWrite
-         menuLoose:
-              oxgFILLS 4, 2, 36, 2, _BLACK_
-              oxgSETCURSOR 5, 2
-              lea  DX, looseLbl
-              mov  CX, l_looseLbl
-         menuWrite:
-              mov  AH, 40h
-              int  21h
+         mov  DX, g_cursY
+         sub  DX, _g_virSize
+         CLEARVIRUS 122, DX
+         cmp g_virusAnimFrames, 30
+         ja drawAltMenuVirus
+         DRAWVIRUSo 122, DX
+         jmp finallyMenu
+         drawAltMenuVirus:
+         DRAWVIRao 122, DX
 
+         finallyMenu:
               pop  DX
               pop  CX
               pop  BX
               pop  AX
-         skipWin:
+
          call g_ANIMATEVIRUSES
 
          push AX
@@ -129,7 +127,7 @@ MAIN     PROC FAR
          je   skipEndGame
          push AX
          oxDELAY 14F0h
-         jmp  menu
+         jmp  init_menu
 
          skipEndGame:
          cmp  g_projShow, 0
@@ -170,7 +168,7 @@ MAIN     PROC FAR
          je   SPACEpressed
          ; Si c'est ECHAP
          cmp  AH, _ESCkey_
-         je   menu
+         je   init_menu
          ; Sinon
          jmp  draw
 

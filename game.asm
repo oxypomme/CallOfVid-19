@@ -707,6 +707,7 @@ g_MENU PROC NEAR
     push CX
     push DX
 
+    oxgFILLS 0, 0, 39, 24, _WHITE_
     oxgFILLS 11, 5, 28, 15, _BLACK_
 
     oxgSETCURSOR 13, 7
@@ -733,17 +734,30 @@ g_MENU PROC NEAR
     int  21h
     oxgSETCURSOR 0, 0
 
-    mov  DX, g_cursY
-    sub  DX, _g_virSize
-    CLEARVIRUS 122, DX
-    cmp g_virusAnimFrames, 30
-    ja drawAltMenuVirus
-    DRAWVIRUSo 122, DX
-    jmp finallyMenu
-    drawAltMenuVirus:
-    DRAWVIRao 122, DX
+    ; on va écrire l'état du jeu (gagnant ou perdant)
+    mov  BX, 0001h
 
-    finallyMenu:
+    cmp  g_playerWin, 2
+    je   skipWin
+    cmp  g_playerWin, 1
+    jne  menuLoose
+         
+    oxgFILLS 2, 1, 37, 3, _BLACK_
+    oxgSETCURSOR 3, 2
+    lea  DX, winLbl
+    mov  CX, l_winLbl
+    jmp  menuWrite
+    menuLoose:
+         oxgFILLS 4, 1, 36, 3, _BLACK_
+         oxgSETCURSOR 5, 2
+         lea  DX, looseLbl
+         mov  CX, l_looseLbl
+    menuWrite:
+         mov  AH, 40h
+         int  21h
+
+    skipWin:
+
     pop  DX
     pop  CX
     pop  BX
@@ -772,13 +786,13 @@ g_CHECKWIN ENDP
 ;
 ; dessine les virus
 g_DRAWMOBS PROC FAR
-     cmp g_virusAnimFrames, 30
-     ja drawAltVir
+    cmp g_virusAnimFrames, 30
+    ja drawAltVir
     cmp  mobsShowing, 0
     jz   drawSecVirus
      
-     CLEARVIRUS mobsX, mobsY
-     DRAWVIRUSo mobsX, mobsY
+    CLEARVIRUS mobsX, mobsY
+    DRAWVIRUSo mobsX, mobsY
     drawSecVirus:
          cmp  mobsShowing+2, 0
          jz   drawThiVirus
