@@ -2,6 +2,7 @@
 %include oxylib/oxygame.asm
 %include oxylib/oxyrand.asm
 
+; on inclut le sprite du virus, situé dans le dossier assets
 %include assets/drawV3.asm
 %include assets/drawV3a.asm
 
@@ -40,7 +41,7 @@ DSEG        SEGMENT
     ; ordonnée du bouton quitter
     _QUITy_         EQU 115
     ; message de victoire
-    winLbl          DB "The VID-19 is'nt a treat anymore !"
+    winLbl          DB "The VID-19 isn't a treat anymore !"
     l_winLbl        EQU $-winLbl
     ; message de défaite
     looseLbl        DB "You failed to stem the VID-19 !"
@@ -103,11 +104,24 @@ g_INIT PROC NEAR
     mov projY, 0
     mov projRight, 1
 
-    SPAWNVIRUS mobsX, mobsY, mobsShowing
-    SPAWNVIRUS mobsX+2, mobsY+2, mobsShowing+2
-    SPAWNVIRUS mobsX+4, mobsY+4, mobsShowing+4
-    SPAWNVIRUS mobsX+6, mobsY+6, mobsShowing+6
+    ; SPAWNVIRUS mobsX, mobsY, mobsShowing
+    mov  mobsX, 166
+    mov  mobsY, 159
+    mov  mobsShowing, 1
+    ; SPAWNVIRUS mobsX+2, mobsY+2, mobsShowing+2
+    mov  mobsX+2, 136
+    mov  mobsY+2, 156
+    mov  mobsShowing+2, 1
+    ; SPAWNVIRUS mobsX+4, mobsY+4, mobsShowing+4
+    mov  mobsX+4, 258
+    mov  mobsY+4, 166
+    mov  mobsShowing+4, 1
+    ; SPAWNVIRUS mobsX+6, mobsY+6, mobsShowing+6
+    mov  mobsX+6, 165
+    mov  mobsY+6, 57
+    mov  mobsShowing+6, 1
 
+    mov  g_playerWin, 2
     mov  g_projShow, 0
     mov  g_altSprite, 0
     mov  g_spriteCounter, 0
@@ -257,7 +271,7 @@ g_PLAYERCOLLIDEMOB PROC FAR
     cmp  playerX, AX
     jg   playerIsOnMobTwo
     mov  BX, _g_virSize
-    sar  BX, 1
+    ;sar  BX, 1
     mov  AX, mobsY
     sub  AX, BX
     cmp  playerY, AX
@@ -278,7 +292,7 @@ g_PLAYERCOLLIDEMOB PROC FAR
     cmp  playerX, AX
     jg   playerIsOnMobThr
     mov  BX, _g_virSize
-    sar  BX, 1
+    ;sar  BX, 1
     mov  AX, mobsY+2
     sub  AX, BX
     cmp  playerY, AX
@@ -299,7 +313,7 @@ g_PLAYERCOLLIDEMOB PROC FAR
     cmp  playerX, AX
     jg   playerIsOnMobFou
     mov  BX, _g_virSize
-    sar  BX, 1
+    ;sar  BX, 1
     mov  AX, mobsY+4
     sub  AX, BX
     cmp  playerY, AX
@@ -320,7 +334,7 @@ g_PLAYERCOLLIDEMOB PROC FAR
     cmp  playerX, AX
     jg   endPlayerCollide
     mov  BX, _g_virSize
-    sar  BX, 1
+    ;sar  BX, 1
     mov  AX, mobsY+6
     sub  AX, BX
     cmp  playerY, AX
@@ -365,7 +379,6 @@ BULLETCOLLIDEMOBS PROC FAR
     mov  g_projShow, 0
     mov  mobsShowing, 0
     CLEARVIRUS mobsX, mobsY
-
 
     isOnMobTwo:
     cmp  mobsShowing+2, 0

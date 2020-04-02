@@ -6,8 +6,6 @@ SSEG     ENDS
 
 ; Data Segment
 DSEG     SEGMENT
-    keyPressed      DB 0
-    tmp             DW 0
 DSEG     ENDS
 
 ; Code Segment
@@ -130,6 +128,7 @@ MAIN     PROC FAR
          cmp  g_playerWin, 2
          je   skipEndGame
          push AX
+         oxDELAY 14F0h
          jmp  menu
 
          skipEndGame:
